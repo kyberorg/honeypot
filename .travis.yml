@@ -1,0 +1,56 @@
+# Matrix build runs 4 parallel builds
+matrix:
+  include:
+    - language: go  # Build and Test
+      sudo: required
+      services:
+        - docker
+      script:
+        - export GO111MODULE=on
+        - go mod vendor  # Download dependencies
+        - make build  # Build application
+        - test -f bin/linux_amd64/honeypot  # Test for presence of binary built in previous step
+        - make all-container  # Make all Docker containers
+        - docker images | grep "^docker.pkg.github.com/kyberorg/honeypot/honeypot.*__linux_amd64"  # Check presence of created images
+        - make test  # Runs tests inside test image
+
+    - language: go  # SonarCloud
+      addons:
+        sonarcloud:
+          organization: kyberorg
+          token:
+            secure: "<token-here>"
+      before_script:
+        - ./reports.sh  # Creates directories and files for reports
+        - export GO111MODULE=on
+        - go mod vendor  # Download dependencies
+        - make ci  # Run tests and generate reports (See `ci` step in Makefile)
+      script:
+        - sonar-scanner  # Run analysis using SonarCloud scanner plugin
+
+    - language: go  # CodeClimate
+      before_script:
+        - ./reports.sh  # Create directories and files for reports
+        - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter  # Download CodeClimate test reporter
+        - chmod +x ./cc-test-reporter  # Make it executable
+        - ./cc-test-reporter before-build  # Notify CodeClimate of pending report
+      script:
+        - export GO111MODULE=on
+        - go mod vendor  # Download dependencies
+        - make ci  # Run tests and generate reports (See `ci` step in Makefile)
+      after_script:
+        - ./cc-test-reporter after-build -t gocov --exit-code $TRAVIS_TEST_RESULT  # Send report to CodeClimate or notify it of failing build based on exit code
+
+    - language: go  # Push if on trunk
+      services:
+        - docker
+      if: branch = trunk
+      script:
+        - export GO111MODULE=on
+        - go mod vendor  # Download dependencies
+        - echo "$DOCKER_PASSWORD" | docker login docker.pkg.github.com -u "$DOCKER_USERNAME" --password-stdin  # Login to GitHub Registry using Travis environment variables
+        - make container  # Create dirty and latest images
+        - make push  # Push image to registry
+
+notifications:
+  email: false
