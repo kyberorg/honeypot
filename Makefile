@@ -30,10 +30,6 @@ clean: ## Clean build directory.
 	rm -f ./bin/${PROGRAM_NAME}
 	rmdir ./bin
 
-lint: dep ## Lint the source files
-    golangci-lint run --timeout 5m -E golint
-    gosec -quiet ./...
-
 test: dep ## Run tests
 	go test -race -p 1 -timeout 300s -coverprofile=.test_coverage.txt ./... && \
     go tool cover -func=.test_coverage.txt | tail -n1 | awk '{print "Total test coverage: " $$3}'
