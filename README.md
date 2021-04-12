@@ -8,3 +8,8 @@
 ## More Information About This Repo
 Boilerplated from [ MartinHeinz/go-project-blueprint ](https://github.com/MartinHeinz/go-project-blueprint) 
 
+## Build
+```shell
+    CGO_ENABLED=0 go build github.com/kyberorg/honeypot/cmd/honeypot
+```
+
