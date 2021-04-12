@@ -21,3 +21,4 @@ go.sum
 *.iml
 
 *.log
+/honeypot

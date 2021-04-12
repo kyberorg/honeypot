@@ -55,13 +55,21 @@ func main() {
 		}
 	}
 
+	portString := strconv.Itoa(int(appConfig.Port))
+
 	sshServer := &ssh.Server{
-		Addr:            ":" + strconv.Itoa(int(appConfig.Port)),
+		Addr:            ":" + portString,
 		PasswordHandler: passwordHandler,
 	}
 
 	if hostKey != nil {
 		sshServer.AddHostKey(hostKey)
 	}
+	log.Println("Starting SSH Server at port", portString)
+	log.Println("ready to access connections")
+	if appConfig.AccessLog != "" {
+		log.Println("Logging connections to ", appConfig.AccessLog)
+	}
+
 	log.Fatalln(sshServer.ListenAndServe())
 }
