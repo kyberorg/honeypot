@@ -1,30 +1,61 @@
 package config
 
 import (
-	"fmt"
-	"github.com/spf13/viper"
+	"github.com/kyberorg/honeypot/cmd/honeypot/util"
+	"gopkg.in/alecthomas/kingpin.v2"
+	"io"
+	"log"
+	"os"
 )
 
-// Config is global object that holds all application level variables.
-var Config appConfig
+var (
+	port = kingpin.Flag("port", "Port we start at").Short('p').
+		Envar("PORT").Default("22").Uint16()
+	accessLog = kingpin.Flag("access-log", "Where to log requests").
+			Envar("ACCESS_LOG").String()
+	hostKey = kingpin.Flag("hostkey", "File with private id_rsa key that is used to identify server").
+		Envar("HOSTKEY").String()
+	skipHostKeyGeneration = kingpin.Flag("skip-hostkey-generation",
+		"If set, app won't generate hostkey at start-up").Bool()
+)
 
-type appConfig struct {
-	// Example Variable
-	ConfigVar string
+var alreadyParsed = false
+
+type AppConfig struct {
+	//SSH Port
+	Port uint16
+	//Access Log filename
+	AccessLog string
+	//HostKey filename
+	HostKey string
+	//generate key, if absent
+	GenerateHostKey bool
 }
 
-// LoadConfig loads config from files
-func LoadConfig(configPaths ...string) error {
-	v := viper.New()
-	v.SetConfigName("example")
-	v.SetConfigType("yaml")
-	v.SetEnvPrefix("honeypot")
-	v.AutomaticEnv()
-	for _, path := range configPaths {
-		v.AddConfigPath(path)
+func GetAppConfig() AppConfig {
+	if !alreadyParsed {
+		kingpin.Parse()
+		alreadyParsed = true
 	}
-	if err := v.ReadInConfig(); err != nil {
-		return fmt.Errorf("failed to read the configuration file: %s", err)
+	return AppConfig{
+		Port:            *port,
+		AccessLog:       *accessLog,
+		HostKey:         *hostKey,
+		GenerateHostKey: !*skipHostKeyGeneration,
 	}
-	return v.Unmarshal(&Config)
+}
+
+func GetAccessLogger(accessLog string) *log.Logger {
+	var logLocation *os.File
+	if accessLog == "" {
+		logLocation = os.Stderr
+	} else {
+		var logOpenError error
+		logLocation, logOpenError = os.OpenFile(accessLog, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+		if logOpenError != nil {
+			util.LogFatal("Unable to open access log file" + logOpenError.Error())
+		}
+	}
+	w := io.MultiWriter(logLocation)
+	return log.New(w, "", 0)
 }
