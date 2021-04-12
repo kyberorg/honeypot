@@ -65,8 +65,10 @@ func main() {
 	if hostKey != nil {
 		sshServer.AddHostKey(hostKey)
 	}
+
 	log.Println("Starting SSH Server at port", portString)
 	log.Println("ready to access connections")
+
 	if appConfig.AccessLog != "" {
 		log.Println("Logging connections to ", appConfig.AccessLog)
 	}

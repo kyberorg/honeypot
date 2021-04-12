@@ -2,14 +2,9 @@ package util
 
 import (
 	"errors"
-	"log"
 	"net"
 	"os"
 )
-
-func LogFatal(message string) {
-	log.Fatalln(message)
-}
 
 // IsFileExists reports whether the named file or directory exists.
 func IsFileExists(name string) bool {

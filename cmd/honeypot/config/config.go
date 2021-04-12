@@ -1,7 +1,6 @@
 package config
 
 import (
-	"github.com/kyberorg/honeypot/cmd/honeypot/util"
 	"gopkg.in/alecthomas/kingpin.v2"
 	"io"
 	"log"
@@ -19,8 +18,13 @@ var (
 		"If set, app won't generate hostkey at start-up").Bool()
 )
 
+//logger for access log
+var accessLogger *log.Logger
+
+//are params already parsed
 var alreadyParsed = false
 
+//AppConfig application configuration values
 type AppConfig struct {
 	//SSH Port
 	Port uint16
@@ -28,10 +32,11 @@ type AppConfig struct {
 	AccessLog string
 	//HostKey filename
 	HostKey string
-	//generate key, if absent
+	//Generate key, if HostKey absent
 	GenerateHostKey bool
 }
 
+//GetAppConfig parses args and converts 'em to AppConfig
 func GetAppConfig() AppConfig {
 	if !alreadyParsed {
 		kingpin.Parse()
@@ -45,6 +50,7 @@ func GetAppConfig() AppConfig {
 	}
 }
 
+//GetAccessLogger logger for access log
 func GetAccessLogger(accessLog string) *log.Logger {
 	var logLocation *os.File
 	if accessLog == "" {
@@ -53,9 +59,13 @@ func GetAccessLogger(accessLog string) *log.Logger {
 		var logOpenError error
 		logLocation, logOpenError = os.OpenFile(accessLog, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 		if logOpenError != nil {
-			util.LogFatal("Unable to open access log file" + logOpenError.Error())
+			log.Fatalln("Unable to open access log file" + logOpenError.Error())
 		}
 	}
-	w := io.MultiWriter(logLocation)
-	return log.New(w, "", 0)
+	if accessLogger == nil {
+		w := io.MultiWriter(logLocation)
+		accessLogger = log.New(w, "", 0)
+	}
+	return accessLogger
+
 }

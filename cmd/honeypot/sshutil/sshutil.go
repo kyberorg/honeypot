@@ -21,6 +21,7 @@ const (
 	NoHostKeyMarker          = "HostKey is not provided and generation is skipped"
 )
 
+//HostKey generates or reads host key file, used to identify server
 func HostKey(appConfig *config.AppConfig) (gossh.Signer, error) {
 	var hostKeyFile string
 	if appConfig.HostKey != "" {
