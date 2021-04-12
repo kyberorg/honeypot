@@ -1,0 +1,33 @@
+before:
+  hooks:
+    - make dep
+
+builds:
+  - binary: honeypot
+    main: ./cmd
+    goarch:
+      - amd64
+    goos:
+      - linux
+    env:
+      - CGO_ENABLED=0
+    ldflags:
+      - -a -installsuffix cgo
+      - -X main.gitTag={{.Tag}} -X main.gitCommit={{.Commit}} -X main.gitBranch={{.Branch}}
+
+archives:
+  - builds: [honeypot]
+
+changelog:
+  sort: asc
+
+nfpms:
+  - vendor: honeypot
+    homepage: https://github.com/kyberorg/honeypot
+    maintainer: Aleksandr Muravja
+    description: Fake SSH Server that collects passwords
+    license: The Unlicense
+    formats:
+      - apk
+      - deb
+      - rpm
