@@ -40,5 +40,5 @@ release:
     owner: kyberorg
     name: honeypot
 
-    prerelease: auto
-    name_template: "{{.ProjectName}}-{{.Version}}"
+  prerelease: auto
+  name_template: "{{.ProjectName}}-{{.Version}}"
