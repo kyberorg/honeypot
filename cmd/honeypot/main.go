@@ -6,14 +6,16 @@ import (
 	"github.com/kyberorg/honeypot/cmd/honeypot/config"
 	"github.com/kyberorg/honeypot/cmd/honeypot/sshutil"
 	"github.com/kyberorg/honeypot/cmd/honeypot/util"
-	log "github.com/sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 	"strconv"
 	"time"
 )
 
 var appConfig = config.GetAppConfig()
+var log *logrus.Logger
 
 type collectedData struct {
+	Time     string `json:"time"`
 	User     string `json:"user"`
 	Password string `json:"password"`
 	IP       string `json:"ip"`
@@ -28,6 +30,7 @@ func passwordHandler(ctx ssh.Context, password string) bool {
 	}
 
 	collectedData := collectedData{
+		Time:     time.Now().Format("02/01/2006 15:04:05-0700"),
 		User:     ctx.User(),
 		Password: password,
 		IP:       ip,
@@ -44,6 +47,9 @@ func passwordHandler(ctx ssh.Context, password string) bool {
 
 func main() {
 	appConfig := config.GetAppConfig()
+
+	//override application logger
+	log = config.GetApplicationLogger(appConfig.ApplicationLog)
 
 	//getting HostKey
 	hostKey, hostKeyErr := sshutil.HostKey(&appConfig)
@@ -70,7 +76,7 @@ func main() {
 	log.Println("ready to access connections")
 
 	if appConfig.AccessLog != "" {
-		log.Println("Logging connections to ", appConfig.AccessLog)
+		log.Println("Logging connections to", appConfig.AccessLog)
 	}
 
 	log.Fatalln(sshServer.ListenAndServe())
