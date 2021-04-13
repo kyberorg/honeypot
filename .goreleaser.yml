@@ -4,7 +4,7 @@ before:
 
 builds:
   - binary: honeypot
-    main: ./cmd
+    main: ./cmd/honeypot
     goarch:
       - amd64
     goos:
