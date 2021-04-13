@@ -44,10 +44,8 @@ jobs:
       - name: Make Binary
         run: make binary
 
-      - name: Publish
-        uses: skx/github-action-publish-binaries@release-0.15
+      - name: Storing binary
+        uses: actions/upload-artifact@v2
         with:
-          args: 'bin/honeypot'
-          releaseId: current
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          name: honeypot
+          path: bin/honeypot
