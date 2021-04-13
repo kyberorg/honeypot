@@ -34,3 +34,9 @@ nfpms:
       - deb
       - rpm
     bindir: /usr/bin
+
+release:
+
+  github:
+    prerelease: auto
+    name_template: "{{.ProjectName}}-{{.Version}}"
