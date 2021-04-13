@@ -36,7 +36,9 @@ nfpms:
     bindir: /usr/bin
 
 release:
-
   github:
+    owner: kyberorg
+    name: honeypot
+
     prerelease: auto
     name_template: "{{.ProjectName}}-{{.Version}}"
