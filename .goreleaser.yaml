@@ -35,6 +35,9 @@ nfpms:
       - rpm
     bindir: /usr/bin
 
+snapshot:
+  name_template: {{.Branch}}-CURRENT
+
 release:
   github:
     owner: kyberorg

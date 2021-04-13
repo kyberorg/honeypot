@@ -28,7 +28,7 @@ jobs:
       - name: Push image to Docker Hub (tag 'latest')
         run: make docker-push DOCKER_REPO=ghcr.io/kyberorg/honeypot DOCKER_TAG=latest
 
-  goreleaser:
+  binary:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -41,10 +41,12 @@ jobs:
         with:
           go-version: 1.16
 
-      - name: GoReleaser
-        uses: goreleaser/goreleaser-action@v2
+      - name: Make Binary
+        run: make binary
+
+      - name: Publish
+        uses: skx/github-action-publish-binaries@release-0.15
         with:
-          version: latest
-          args: release --rm-dist
+          args: 'bin/honeypot'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
