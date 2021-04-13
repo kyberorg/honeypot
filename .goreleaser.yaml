@@ -1,3 +1,5 @@
+project_name: honeypot
+
 before:
   hooks:
     - make dep
@@ -24,10 +26,11 @@ changelog:
 nfpms:
   - vendor: honeypot
     homepage: https://github.com/kyberorg/honeypot
-    maintainer: Aleksandr Muravja
+    maintainer: Aleksandr Muravja <root@kyberorg.io>
     description: Fake SSH Server that collects passwords
     license: The Unlicense
     formats:
       - apk
       - deb
       - rpm
+    bindir: /usr/bin
