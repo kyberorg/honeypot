@@ -48,5 +48,6 @@ jobs:
         uses: skx/github-action-publish-binaries@release-0.15
         with:
           args: 'bin/honeypot'
+          releaseId: current
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
