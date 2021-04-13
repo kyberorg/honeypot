@@ -7,7 +7,7 @@ TAG=$(shell git describe --tags |cut -d- -f1)
 
 # Docker Stuff
 DOCKER_REPO = kyberorg/honeypot
-DOCKER_TAG = ${TAG:latest}
+DOCKER_TAG = latest
 
 LDFLAGS = -ldflags "-X main.gitTag=${TAG} -X main.gitCommit=${COMMIT} -X main.gitBranch=${BRANCH}"
 
@@ -26,8 +26,10 @@ build: dep ## Build executable.
 	mkdir -p ./bin
 	CGO_ENABLED=0 GOOS=linux GOARCH=${GOARCH} go build ${LDFLAGS} -o bin/${BINARY} ./cmd
 
+binary: build ## Alias to `build`
+
 clean: ## Clean build directory.
-	rm -f ./bin/${PROGRAM_NAME}
+	rm -f ./bin/${BINARY}
 	rmdir ./bin
 
 test: dep ## Run tests
@@ -41,3 +43,5 @@ docker-build: ## Build docker image
 
 docker-push: ## Push docker image to registry
 	docker push ${DOCKER_REPO}:${DOCKER_TAG}
+
+docker: docker-build ## Alias to `docker-build`

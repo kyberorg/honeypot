@@ -15,7 +15,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Build docker image
+      - name: Build docker image (tag 'latest')
         run: make docker-build
 
       - name: Login to DockerHub
@@ -24,7 +24,7 @@ jobs:
           username: ${{ secrets.HUB_USERNAME }}
           password: ${{ secrets.HUB_PASSWORD }}
 
-      - name: Push image to Docker Hub
+      - name: Push image to Docker Hub (tag 'latest')
         run: make docker-push
 
   goreleaser:
