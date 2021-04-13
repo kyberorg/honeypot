@@ -24,7 +24,7 @@ dep: ## Download the dependencies.
 
 build: dep ## Build executable.
 	mkdir -p ./bin
-	CGO_ENABLED=0 GOOS=linux GOARCH=${GOARCH} go build ${LDFLAGS} -o bin/${BINARY} ./cmd
+	CGO_ENABLED=0 GOOS=linux GOARCH=${GOARCH} go build ${LDFLAGS} -o bin/${BINARY} ./cmd/honeypot
 
 binary: build ## Alias to `build`
 

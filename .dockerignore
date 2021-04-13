@@ -1,4 +1,8 @@
+.github
+.go
 .idea
+bin
+vendor
 .gitignore
 *.log
 *.md
