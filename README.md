@@ -3,8 +3,9 @@
 [![Maintainability](https://api.codeclimate.com/v1/badges/51bc8dc67c396a7b87c4/maintainability)](https://codeclimate.com/github/kyberorg/honeypot/maintainability)
 [![Go Report Card](https://goreportcard.com/badge/github.com/kyberorg/honeypot)](https://goreportcard.com/report/github.com/kyberorg/honeypot)
 
-Honeypot listens for incoming ssh connections and writes the ip address, username, and password. 
-This was written just for fun.
+A simple SSH honeypot written on Go. Strictly not a honeypot as it doesn't trap or jail anything, it simply collects data on attempts to login to a generic SSH server open to the internet.
+
+The tool runs an SSH server that rejects all login attempts. There is no session created it just allows a login attempt and records the username and password and source IP for later analysis.
 
 ## Build
 
