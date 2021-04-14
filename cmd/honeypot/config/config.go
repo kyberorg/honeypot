@@ -1,6 +1,8 @@
 package config
 
 import (
+	"github.com/sirupsen/logrus"
+	"github.com/t-tomalak/logrus-easy-formatter"
 	"gopkg.in/alecthomas/kingpin.v2"
 	"io"
 	"log"
@@ -12,6 +14,8 @@ var (
 		Envar("PORT").Default("22").Uint16()
 	accessLog = kingpin.Flag("access-log", "Where to log requests").
 			Envar("ACCESS_LOG").String()
+	applicationLog = kingpin.Flag("log", "File to sent application logs").
+			Envar("LOG_FILE").String()
 	hostKey = kingpin.Flag("hostkey", "File with private id_rsa key that is used to identify server").
 		Envar("HOSTKEY").String()
 	skipHostKeyGeneration = kingpin.Flag("skip-hostkey-generation",
@@ -20,6 +24,9 @@ var (
 
 //logger for access log
 var accessLogger *log.Logger
+
+//application logger
+var applicationLogger *logrus.Logger
 
 //are params already parsed
 var alreadyParsed = false
@@ -30,6 +37,8 @@ type AppConfig struct {
 	Port uint16
 	//Access Log filename
 	AccessLog string
+	//Application Log filename
+	ApplicationLog string
 	//HostKey filename
 	HostKey string
 	//Generate key, if HostKey absent
@@ -45,6 +54,7 @@ func GetAppConfig() AppConfig {
 	return AppConfig{
 		Port:            *port,
 		AccessLog:       *accessLog,
+		ApplicationLog:  *applicationLog,
 		HostKey:         *hostKey,
 		GenerateHostKey: !*skipHostKeyGeneration,
 	}
@@ -52,20 +62,43 @@ func GetAppConfig() AppConfig {
 
 //GetAccessLogger logger for access log
 func GetAccessLogger(accessLog string) *log.Logger {
-	var logLocation *os.File
-	if accessLog == "" {
-		logLocation = os.Stderr
-	} else {
-		var logOpenError error
-		logLocation, logOpenError = os.OpenFile(accessLog, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
-		if logOpenError != nil {
-			log.Fatalln("Unable to open access log file" + logOpenError.Error())
-		}
-	}
+	var logDestination = getLogDestination(accessLog)
+
 	if accessLogger == nil {
-		w := io.MultiWriter(logLocation)
-		accessLogger = log.New(w, "", 0)
+		writer := io.MultiWriter(logDestination)
+		accessLogger = log.New(writer, "", 0)
 	}
 	return accessLogger
+}
 
+//GetApplicationLogger main app logger
+func GetApplicationLogger(logFile string) *logrus.Logger {
+	logDestination := getLogDestination(logFile)
+	writer := io.MultiWriter(logDestination)
+
+	if applicationLogger == nil {
+		applicationLogger = logrus.New()
+		applicationLogger.SetFormatter(&easy.Formatter{
+			TimestampFormat: "02/01/2006 15:04:05-0700",
+			LogFormat:       "%time% - %msg%\n",
+		})
+
+		applicationLogger.SetOutput(writer)
+	}
+	return applicationLogger
+}
+
+//log to file or os.Stdout
+func getLogDestination(logFile string) *os.File {
+	var logLocation *os.File
+	if logFile == "" {
+		logLocation = os.Stdout
+	} else {
+		var logOpenError error
+		logLocation, logOpenError = os.OpenFile(logFile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+		if logOpenError != nil {
+			log.Fatalln("Unable to open log file" + logOpenError.Error())
+		}
+	}
+	return logLocation
 }
