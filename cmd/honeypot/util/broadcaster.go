@@ -4,24 +4,24 @@ import "github.com/kyberorg/honeypot/cmd/honeypot/dto"
 
 // taken from here https://stackoverflow.com/questions/36417199/how-to-broadcast-message-using-channel
 
-type ConnectionBroker struct {
+type Broadcaster struct {
 	stopCh    chan struct{}
-	publishCh chan *dto.CollectedData
-	subCh     chan chan *dto.CollectedData
-	unsubCh   chan chan *dto.CollectedData
+	publishCh chan *dto.LoginAttempt
+	subCh     chan chan *dto.LoginAttempt
+	unsubCh   chan chan *dto.LoginAttempt
 }
 
-func NewBroker() *ConnectionBroker {
-	return &ConnectionBroker{
+func NewBroadcaster() *Broadcaster {
+	return &Broadcaster{
 		stopCh:    make(chan struct{}),
-		publishCh: make(chan *dto.CollectedData, 1),
-		subCh:     make(chan chan *dto.CollectedData, 1),
-		unsubCh:   make(chan chan *dto.CollectedData, 1),
+		publishCh: make(chan *dto.LoginAttempt, 1),
+		subCh:     make(chan chan *dto.LoginAttempt, 1),
+		unsubCh:   make(chan chan *dto.LoginAttempt, 1),
 	}
 }
 
-func (b *ConnectionBroker) Start() {
-	subs := map[chan *dto.CollectedData]struct{}{}
+func (b *Broadcaster) Start() {
+	subs := map[chan *dto.LoginAttempt]struct{}{}
 	for {
 		select {
 		case <-b.stopCh:
@@ -44,20 +44,20 @@ func (b *ConnectionBroker) Start() {
 	}
 }
 
-func (b *ConnectionBroker) Stop() {
+func (b *Broadcaster) Stop() {
 	close(b.stopCh)
 }
 
-func (b *ConnectionBroker) Subscribe() chan *dto.CollectedData {
-	msgCh := make(chan *dto.CollectedData, 5)
+func (b *Broadcaster) Subscribe() chan *dto.LoginAttempt {
+	msgCh := make(chan *dto.LoginAttempt, 5)
 	b.subCh <- msgCh
 	return msgCh
 }
 
-func (b *ConnectionBroker) Unsubscribe(msgCh chan *dto.CollectedData) {
+func (b *Broadcaster) Unsubscribe(msgCh chan *dto.LoginAttempt) {
 	b.unsubCh <- msgCh
 }
 
-func (b *ConnectionBroker) Publish(msg *dto.CollectedData) {
+func (b *Broadcaster) Send(msg *dto.LoginAttempt) {
 	b.publishCh <- msg
 }

@@ -3,11 +3,10 @@ package main
 import (
 	"github.com/gliderlabs/ssh"
 	"github.com/kyberorg/honeypot/cmd/honeypot/config"
-	"github.com/kyberorg/honeypot/cmd/honeypot/conlog"
 	"github.com/kyberorg/honeypot/cmd/honeypot/dto"
-	"github.com/kyberorg/honeypot/cmd/honeypot/metrics"
 	"github.com/kyberorg/honeypot/cmd/honeypot/sshutil"
 	"github.com/kyberorg/honeypot/cmd/honeypot/util"
+	"github.com/kyberorg/honeypot/cmd/honeypot/writer"
 	"github.com/sirupsen/logrus"
 	"strconv"
 	"time"
@@ -23,14 +22,14 @@ func passwordHandler(ctx ssh.Context, password string) bool {
 		log.Println("new connection from", ip)
 	}
 
-	collectedData := dto.CollectedData{
+	loginAttempt := dto.LoginAttempt{
 		Time:     time.Now().Format("02/01/2006 15:04:05-0700"),
 		User:     ctx.User(),
 		Password: password,
 		IP:       ip,
 	}
 
-	config.GetBroker().Publish(&collectedData)
+	config.LoginAttemptChannel.Send(&loginAttempt)
 
 	//small delay to emulate "real" SSH
 	time.Sleep(1 * time.Second)
@@ -43,9 +42,8 @@ func main() {
 	//override application logger
 	log = config.GetApplicationLogger()
 
-	//starting connection readers
-	go conlog.LogConnection()
-	go metrics.RecordMetric()
+	//register writers (functions receiving published by passwordHandler object)
+	registerWriters()
 
 	//getting HostKey
 	hostKey, hostKeyErr := sshutil.HostKey(&appConfig)
@@ -76,4 +74,9 @@ func main() {
 	}
 
 	log.Fatalln(sshServer.ListenAndServe())
+}
+
+func registerWriters() {
+	go writer.NewAccessLogWriter().WriteToLog()
+	go writer.NewMetricsWriter().RecordMetric()
 }

@@ -1,6 +1,6 @@
 package dto
 
-type CollectedData struct {
+type LoginAttempt struct {
 	Time     string `json:"time"`
 	User     string `json:"user"`
 	Password string `json:"password"`
