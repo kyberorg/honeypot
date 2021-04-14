@@ -1,6 +1,7 @@
 package config
 
 import (
+	"github.com/kyberorg/honeypot/cmd/honeypot/util"
 	"github.com/sirupsen/logrus"
 	"github.com/t-tomalak/logrus-easy-formatter"
 	"gopkg.in/alecthomas/kingpin.v2"
@@ -30,6 +31,9 @@ var applicationLogger *logrus.Logger
 
 //are params already parsed
 var alreadyParsed = false
+
+//message broker
+var broker *util.ConnectionBroker
 
 //AppConfig application configuration values
 type AppConfig struct {
@@ -61,7 +65,8 @@ func GetAppConfig() AppConfig {
 }
 
 //GetAccessLogger logger for access log
-func GetAccessLogger(accessLog string) *log.Logger {
+func GetAccessLogger() *log.Logger {
+	accessLog := GetAppConfig().AccessLog
 	var logDestination = getLogDestination(accessLog)
 
 	if accessLogger == nil {
@@ -72,8 +77,9 @@ func GetAccessLogger(accessLog string) *log.Logger {
 }
 
 //GetApplicationLogger main app logger
-func GetApplicationLogger(logFile string) *logrus.Logger {
-	logDestination := getLogDestination(logFile)
+func GetApplicationLogger() *logrus.Logger {
+	applicationLog := GetAppConfig().ApplicationLog
+	logDestination := getLogDestination(applicationLog)
 	writer := io.MultiWriter(logDestination)
 
 	if applicationLogger == nil {
@@ -86,6 +92,14 @@ func GetApplicationLogger(logFile string) *logrus.Logger {
 		applicationLogger.SetOutput(writer)
 	}
 	return applicationLogger
+}
+
+func GetBroker() *util.ConnectionBroker {
+	if broker == nil {
+		broker = util.NewBroker()
+		go broker.Start()
+	}
+	return broker
 }
 
 //log to file or os.Stdout
