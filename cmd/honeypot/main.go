@@ -14,28 +14,6 @@ import (
 
 var log *logrus.Logger
 
-func passwordHandler(ctx ssh.Context, password string) bool {
-	ip, ipErr := util.ParseIP(ctx.RemoteAddr().String())
-	if ipErr != nil {
-		log.Println("new connection")
-	} else {
-		log.Println("new connection from", ip)
-	}
-
-	loginAttempt := dto.LoginAttempt{
-		Time:     time.Now().Format("02/01/2006 15:04:05-0700"),
-		User:     ctx.User(),
-		Password: password,
-		IP:       ip,
-	}
-
-	config.LoginAttemptChannel.Send(&loginAttempt)
-
-	//small delay to emulate "real" SSH
-	time.Sleep(1 * time.Second)
-	return false
-}
-
 func main() {
 	appConfig := config.GetAppConfig()
 
@@ -79,4 +57,26 @@ func main() {
 func registerWriters() {
 	go writer.NewAccessLogWriter().WriteToLog()
 	go writer.NewMetricsWriter().RecordMetric()
+}
+
+func passwordHandler(ctx ssh.Context, password string) bool {
+	ip, ipErr := util.ParseIP(ctx.RemoteAddr().String())
+	if ipErr != nil {
+		log.Println("new connection")
+	} else {
+		log.Println("new connection from", ip)
+	}
+
+	loginAttempt := dto.LoginAttempt{
+		Time:     time.Now().Format("02/01/2006 15:04:05-0700"),
+		User:     ctx.User(),
+		Password: password,
+		IP:       ip,
+	}
+
+	config.LoginAttemptChannel.Send(&loginAttempt)
+
+	//small delay to emulate "real" SSH
+	time.Sleep(1 * time.Second)
+	return false
 }

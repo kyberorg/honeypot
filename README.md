@@ -11,14 +11,15 @@ The tool runs an SSH server that rejects all login attempts. There is no session
 
 ### Making binary
 ```shell
-    CGO_ENABLED=0 go build github.com/kyberorg/honeypot/cmd/honeypot
-```
-or
-```shell
    make binary
+```
+or direct way if `make` not an option for you
+```shell
+    CGO_ENABLED=0 go build github.com/kyberorg/honeypot/cmd/honeypot
 ```
 
 ### Docker
+See our [DockerHub Repo](https://hub.docker.com/repository/docker/kyberorg/honeypot)
 ```shell
    docker pull kyberorg/honeypot:tagname
 ```
