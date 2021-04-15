@@ -1,6 +1,7 @@
 package config
 
 import (
+	"github.com/kyberorg/honeypot/cmd/honeypot/util"
 	"github.com/sirupsen/logrus"
 	"github.com/t-tomalak/logrus-easy-formatter"
 	"gopkg.in/alecthomas/kingpin.v2"
@@ -22,6 +23,9 @@ var (
 		"If set, app won't generate hostkey at start-up").Bool()
 )
 
+//LoginAttemptChannel for sending and receiving dto.LoginAttempt objects
+var LoginAttemptChannel = getBroadcaster()
+
 //logger for access log
 var accessLogger *log.Logger
 
@@ -30,6 +34,9 @@ var applicationLogger *logrus.Logger
 
 //are params already parsed
 var alreadyParsed = false
+
+//singleton keeper
+var broadcasterObject *util.Broadcaster
 
 //AppConfig application configuration values
 type AppConfig struct {
@@ -61,7 +68,8 @@ func GetAppConfig() AppConfig {
 }
 
 //GetAccessLogger logger for access log
-func GetAccessLogger(accessLog string) *log.Logger {
+func GetAccessLogger() *log.Logger {
+	accessLog := GetAppConfig().AccessLog
 	var logDestination = getLogDestination(accessLog)
 
 	if accessLogger == nil {
@@ -72,8 +80,9 @@ func GetAccessLogger(accessLog string) *log.Logger {
 }
 
 //GetApplicationLogger main app logger
-func GetApplicationLogger(logFile string) *logrus.Logger {
-	logDestination := getLogDestination(logFile)
+func GetApplicationLogger() *logrus.Logger {
+	applicationLog := GetAppConfig().ApplicationLog
+	logDestination := getLogDestination(applicationLog)
 	writer := io.MultiWriter(logDestination)
 
 	if applicationLogger == nil {
@@ -86,6 +95,14 @@ func GetApplicationLogger(logFile string) *logrus.Logger {
 		applicationLogger.SetOutput(writer)
 	}
 	return applicationLogger
+}
+
+func getBroadcaster() *util.Broadcaster {
+	if broadcasterObject == nil {
+		broadcasterObject = util.NewBroadcaster()
+		go broadcasterObject.Start()
+	}
+	return broadcasterObject
 }
 
 //log to file or os.Stdout
