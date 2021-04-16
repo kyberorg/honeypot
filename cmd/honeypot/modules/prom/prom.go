@@ -20,8 +20,8 @@ var (
 type PrometheusMetricsHandler struct {
 	connectionsCounter  prometheus.Counter
 	uniqueSourceCounter prometheus.Counter
-	messageChannel      chan *dto.LoginAttempt //TODO inherit something (dunno what) struct instead
-	log                 *logrus.Logger         //TODO inherit config.log struct instead
+	messageChannel      chan *dto.LoginAttempt
+	log                 *logrus.Logger
 	uniqueIPs           []string
 }
 
