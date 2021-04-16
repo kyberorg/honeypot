@@ -25,7 +25,7 @@ var (
 
 //prom metrics params
 var (
-	promMetricsEnabled = kingpin.Flag("prom-metrics-enable", "Enables Prometheus Metrics Module").Bool()
+	promMetricsEnabled = kingpin.Flag("prom-metrics-enabled", "Enables Prometheus Metrics Module").Bool()
 	promMetricsPort    = kingpin.Flag("prom-metrics-port", "Port for serving metrics").Default("2112").
 				Uint16()
 	promMetricsPath = kingpin.Flag("prom-metrics-path", "Custom path where metrics are served").
@@ -65,6 +65,7 @@ type AppConfig struct {
 	PromMetrics
 }
 
+//PromMetrics module flags
 type PromMetrics struct {
 	//Prom Metrics module
 	Enabled bool
@@ -126,7 +127,8 @@ func GetApplicationLogger() *logrus.Logger {
 	return applicationLogger
 }
 
-func IsPromMetricsEnabled() bool {
+//IsPromMetricsModuleEnabled says if PromMetrics module is enabled or not, based on activation flag.
+func IsPromMetricsModuleEnabled() bool {
 	return GetAppConfig().PromMetrics.Enabled
 }
 

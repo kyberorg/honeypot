@@ -52,7 +52,7 @@ func main() {
 		log.Println("Logging connections to", appConfig.AccessLog)
 	}
 
-	if config.IsPromMetricsEnabled() {
+	if config.IsPromMetricsModuleEnabled() {
 		go prom.GetPrometheusMetricsHandler().StartMetricsServer()
 	}
 
@@ -62,7 +62,7 @@ func main() {
 func registerWriters() {
 	go writer.NewAccessLogWriter().WriteToLog()
 	go writer.NewMetricsWriter().RecordMetric()
-	if config.IsPromMetricsEnabled() {
+	if config.IsPromMetricsModuleEnabled() {
 		go prom.GetPrometheusMetricsHandler().RecordMetrics()
 	}
 }

@@ -11,7 +11,7 @@ Prefix can be customised see [prefix param](#Prefix)
 ## Usage
 ### How to activate
 ```shell
---prom-metrics-enable
+--prom-metrics-enabled
 ```
 
 ### Params
