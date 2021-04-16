@@ -42,3 +42,9 @@ See our [DockerHub Repo](https://hub.docker.com/repository/docker/kyberorg/honey
 Module that exposes prometheus metrics.
 
 [Module Readme](cmd/honeypot/modules/prom/README.md)
+
+```shell
+--prom-metrics-enable
+```
+
+
