@@ -7,8 +7,8 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/sirupsen/logrus"
-	"log"
 	"net/http"
+	"strconv"
 	"sync"
 )
 
@@ -28,10 +28,12 @@ type PrometheusMetricsHandler struct {
 // Metric name parts.
 const (
 	// Prefix for all metrics.
-	prefix = "honeypot" //TODO customize prefix with params
+	defaultPrefix = "honeypot"
 )
 
 func init() {
+	prefix := getPrefix()
+
 	singleHandler = &PrometheusMetricsHandler{
 		connectionsCounter: promauto.NewCounter(prometheus.CounterOpts{
 			Name: prefix + "_connections",
@@ -54,13 +56,15 @@ func GetPrometheusMetricsHandler() *PrometheusMetricsHandler {
 
 func (h *PrometheusMetricsHandler) StartMetricsServer() {
 	once.Do(func() {
-		//TODO port and path from config
-		log.Println("Starting metrics server at port 2112")
+		port := strconv.Itoa(int(config.GetAppConfig().PromMetrics.Port))
+		path := config.GetAppConfig().PromMetrics.Path
 
-		http.Handle("/metrics", promhttp.Handler())
-		err := http.ListenAndServe(":2112", nil)
+		h.log.Printf("Starting metrics server at port %s", port)
+
+		http.Handle(path, promhttp.Handler())
+		err := http.ListenAndServe(":"+port, nil)
 		if err != nil {
-			log.Fatalln("Unable to start prometheus metrics server." +
+			h.log.Fatalln("Unable to start prometheus metrics server." +
 				"Since you enabled prom module, this is probably not what you want to expect")
 		}
 	})
@@ -85,4 +89,12 @@ func (h *PrometheusMetricsHandler) isNewIPConnected(ip string) bool {
 		}
 	}
 	return true
+}
+
+func getPrefix() string {
+	metricsPrefix := config.GetAppConfig().PromMetrics.Prefix
+	if metricsPrefix == "" {
+		metricsPrefix = defaultPrefix
+	}
+	return metricsPrefix
 }

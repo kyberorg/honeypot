@@ -52,8 +52,9 @@ func main() {
 		log.Println("Logging connections to", appConfig.AccessLog)
 	}
 
-	//TODO if module enabled
-	go prom.GetPrometheusMetricsHandler().StartMetricsServer()
+	if config.IsPromMetricsEnabled() {
+		go prom.GetPrometheusMetricsHandler().StartMetricsServer()
+	}
 
 	log.Fatalln(sshServer.ListenAndServe())
 }
@@ -61,7 +62,9 @@ func main() {
 func registerWriters() {
 	go writer.NewAccessLogWriter().WriteToLog()
 	go writer.NewMetricsWriter().RecordMetric()
-	go prom.GetPrometheusMetricsHandler().RecordMetrics() //TODO if module enabled
+	if config.IsPromMetricsEnabled() {
+		go prom.GetPrometheusMetricsHandler().RecordMetrics()
+	}
 }
 
 func passwordHandler(ctx ssh.Context, password string) bool {

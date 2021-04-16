@@ -36,3 +36,9 @@ See our [DockerHub Repo](https://hub.docker.com/repository/docker/kyberorg/honey
 ```shell
    bin/honeypot --help
 ```
+
+## Modules
+### Prometheus Metrics Module
+Module that exposes prometheus metrics.
+
+[Module Readme](cmd/honeypot/modules/prom/README.md)
