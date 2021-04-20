@@ -4,6 +4,7 @@ import (
 	"github.com/gliderlabs/ssh"
 	"github.com/kyberorg/honeypot/cmd/honeypot/config"
 	"github.com/kyberorg/honeypot/cmd/honeypot/dto"
+	"github.com/kyberorg/honeypot/cmd/honeypot/modules/prom"
 	"github.com/kyberorg/honeypot/cmd/honeypot/sshutil"
 	"github.com/kyberorg/honeypot/cmd/honeypot/util"
 	"github.com/kyberorg/honeypot/cmd/honeypot/writer"
@@ -51,12 +52,19 @@ func main() {
 		log.Println("Logging connections to", appConfig.AccessLog)
 	}
 
+	if config.IsPromMetricsModuleEnabled() {
+		go prom.GetPrometheusMetricsHandler().StartMetricsServer()
+	}
+
 	log.Fatalln(sshServer.ListenAndServe())
 }
 
 func registerWriters() {
 	go writer.NewAccessLogWriter().WriteToLog()
 	go writer.NewMetricsWriter().RecordMetric()
+	if config.IsPromMetricsModuleEnabled() {
+		go prom.GetPrometheusMetricsHandler().RecordMetrics()
+	}
 }
 
 func passwordHandler(ctx ssh.Context, password string) bool {

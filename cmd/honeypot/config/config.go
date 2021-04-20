@@ -23,6 +23,16 @@ var (
 		"If set, app won't generate hostkey at start-up").Bool()
 )
 
+//prom metrics params
+var (
+	promMetricsEnabled = kingpin.Flag("prom-metrics-enabled", "Enables Prometheus Metrics Module").Bool()
+	promMetricsPort    = kingpin.Flag("prom-metrics-port", "Port for serving metrics").Default("2112").
+				Uint16()
+	promMetricsPath = kingpin.Flag("prom-metrics-path", "Custom path where metrics are served").
+			Default("/metrics").String()
+	promMetricsPrefix = kingpin.Flag("prom-metrics-prefix", "Custom metrics prefix").String()
+)
+
 //LoginAttemptChannel for sending and receiving dto.LoginAttempt objects
 var LoginAttemptChannel = getBroadcaster()
 
@@ -50,6 +60,18 @@ type AppConfig struct {
 	HostKey string
 	//Generate key, if HostKey absent
 	GenerateHostKey bool
+
+	//PromMetrics module flags
+	PromMetrics
+}
+
+//PromMetrics module flags
+type PromMetrics struct {
+	//Prom Metrics module
+	Enabled bool
+	Port    uint16
+	Path    string
+	Prefix  string
 }
 
 //GetAppConfig parses args and converts 'em to AppConfig
@@ -58,12 +80,20 @@ func GetAppConfig() AppConfig {
 		kingpin.Parse()
 		alreadyParsed = true
 	}
+
 	return AppConfig{
 		Port:            *port,
 		AccessLog:       *accessLog,
 		ApplicationLog:  *applicationLog,
 		HostKey:         *hostKey,
 		GenerateHostKey: !*skipHostKeyGeneration,
+
+		PromMetrics: PromMetrics{
+			Enabled: *promMetricsEnabled,
+			Port:    *promMetricsPort,
+			Path:    *promMetricsPath,
+			Prefix:  *promMetricsPrefix,
+		},
 	}
 }
 
@@ -95,6 +125,11 @@ func GetApplicationLogger() *logrus.Logger {
 		applicationLogger.SetOutput(writer)
 	}
 	return applicationLogger
+}
+
+//IsPromMetricsModuleEnabled says if PromMetrics module is enabled or not, based on activation flag.
+func IsPromMetricsModuleEnabled() bool {
+	return GetAppConfig().PromMetrics.Enabled
 }
 
 func getBroadcaster() *util.Broadcaster {
