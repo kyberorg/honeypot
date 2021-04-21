@@ -8,8 +8,15 @@ import (
 	"io"
 	"log"
 	"os"
+	"sync"
 )
 
+var (
+	once             sync.Once
+	AppConfiguration *AppConfig
+)
+
+//core params
 var (
 	port = kingpin.Flag("port", "Port we start at").Short('p').
 		Envar("PORT").Default("22").Uint16()
@@ -42,9 +49,6 @@ var accessLogger *log.Logger
 //application logger
 var applicationLogger *logrus.Logger
 
-//are params already parsed
-var alreadyParsed = false
-
 //singleton keeper
 var broadcasterObject *util.Broadcaster
 
@@ -74,14 +78,12 @@ type PromMetrics struct {
 	Prefix  string
 }
 
-//GetAppConfig parses args and converts 'em to AppConfig
-func GetAppConfig() AppConfig {
-	if !alreadyParsed {
+func init() {
+	once.Do(func() {
 		kingpin.Parse()
-		alreadyParsed = true
-	}
+	})
 
-	return AppConfig{
+	AppConfiguration = &AppConfig{
 		Port:            *port,
 		AccessLog:       *accessLog,
 		ApplicationLog:  *applicationLog,
@@ -95,6 +97,11 @@ func GetAppConfig() AppConfig {
 			Prefix:  *promMetricsPrefix,
 		},
 	}
+}
+
+//GetAppConfig parses args and converts 'em to AppConfig
+func GetAppConfig() AppConfig {
+	return *AppConfiguration
 }
 
 //GetAccessLogger logger for access log

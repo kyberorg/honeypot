@@ -25,7 +25,7 @@ func main() {
 	registerWriters()
 
 	//getting HostKey
-	hostKey, hostKeyErr := sshutil.HostKey(&appConfig)
+	hostKey, hostKeyErr := sshutil.HostKey(config.AppConfiguration)
 	if hostKeyErr != nil {
 		if hostKeyErr.Error() == sshutil.NoHostKeyMarker {
 			hostKey = nil
