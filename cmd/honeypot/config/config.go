@@ -25,7 +25,7 @@ var (
 
 //prom metrics params
 var (
-	promMetricsEnabled = kingpin.Flag("prom-metrics-enabled", "Enables Prometheus Metrics Module").Bool()
+	promMetricsEnabled = kingpin.Flag("prom-metrics-enable", "Enables Prometheus Metrics Module").Bool()
 	promMetricsPort    = kingpin.Flag("prom-metrics-port", "Port for serving metrics").Default("2112").
 				Uint16()
 	promMetricsPath = kingpin.Flag("prom-metrics-path", "Custom path where metrics are served").
