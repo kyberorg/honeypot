@@ -16,8 +16,6 @@ import (
 var log *logrus.Logger
 
 func main() {
-	appConfig := config.GetAppConfig()
-
 	//override application logger
 	log = config.GetApplicationLogger()
 
@@ -25,7 +23,7 @@ func main() {
 	registerWriters()
 
 	//getting HostKey
-	hostKey, hostKeyErr := sshutil.HostKey(config.AppConfiguration)
+	hostKey, hostKeyErr := sshutil.HostKey(config.AppConfig)
 	if hostKeyErr != nil {
 		if hostKeyErr.Error() == sshutil.NoHostKeyMarker {
 			hostKey = nil
@@ -34,7 +32,7 @@ func main() {
 		}
 	}
 
-	portString := strconv.Itoa(int(appConfig.Port))
+	portString := strconv.Itoa(int(config.AppConfig.Port))
 
 	sshServer := &ssh.Server{
 		Addr:            ":" + portString,
@@ -48,8 +46,8 @@ func main() {
 	log.Println("Starting SSH Server at port", portString)
 	log.Println("ready to access connections")
 
-	if appConfig.AccessLog != "" {
-		log.Println("Logging connections to", appConfig.AccessLog)
+	if config.AppConfig.AccessLog != "" {
+		log.Println("Logging connections to", config.AppConfig.AccessLog)
 	}
 
 	if config.IsPromMetricsModuleEnabled() {

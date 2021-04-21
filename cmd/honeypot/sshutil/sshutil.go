@@ -22,7 +22,7 @@ const (
 )
 
 //HostKey generates or reads host key file, used to identify server
-func HostKey(appConfig *config.AppConfig) (gossh.Signer, error) {
+func HostKey(appConfig *config.AppConfiguration) (gossh.Signer, error) {
 	var hostKeyFile string
 	if appConfig.HostKey != "" {
 		hostKeyFile = appConfig.HostKey

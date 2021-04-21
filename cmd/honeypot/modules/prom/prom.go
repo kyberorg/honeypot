@@ -56,8 +56,8 @@ func GetPrometheusMetricsHandler() *PrometheusMetricsHandler {
 
 func (h *PrometheusMetricsHandler) StartMetricsServer() {
 	once.Do(func() {
-		port := strconv.Itoa(int(config.GetAppConfig().PromMetrics.Port))
-		path := config.GetAppConfig().PromMetrics.Path
+		port := strconv.Itoa(int(config.AppConfig.PromMetrics.Port))
+		path := config.AppConfig.PromMetrics.Path
 
 		h.log.Printf("Starting metrics server at port %s", port)
 
@@ -92,7 +92,7 @@ func (h *PrometheusMetricsHandler) isNewIPConnected(ip string) bool {
 }
 
 func getPrefix() string {
-	metricsPrefix := config.GetAppConfig().PromMetrics.Prefix
+	metricsPrefix := config.AppConfig.PromMetrics.Prefix
 	if metricsPrefix == "" {
 		metricsPrefix = defaultPrefix
 	}

@@ -12,8 +12,10 @@ import (
 )
 
 var (
-	once             sync.Once
-	AppConfiguration *AppConfig
+	// AppConfig object holding application configuration
+	AppConfig *AppConfiguration
+	//LoginAttemptChannel for sending and receiving dto.LoginAttempt objects
+	LoginAttemptChannel = getBroadcaster()
 )
 
 //core params
@@ -40,20 +42,15 @@ var (
 	promMetricsPrefix = kingpin.Flag("prom-metrics-prefix", "Custom metrics prefix").String()
 )
 
-//LoginAttemptChannel for sending and receiving dto.LoginAttempt objects
-var LoginAttemptChannel = getBroadcaster()
+var (
+	once              sync.Once
+	accessLogger      *log.Logger
+	applicationLogger *logrus.Logger
+	broadcasterObject *util.Broadcaster
+)
 
-//logger for access log
-var accessLogger *log.Logger
-
-//application logger
-var applicationLogger *logrus.Logger
-
-//singleton keeper
-var broadcasterObject *util.Broadcaster
-
-//AppConfig application configuration values
-type AppConfig struct {
+//AppConfiguration application configuration values
+type AppConfiguration struct {
 	//SSH Port
 	Port uint16
 	//Access Log filename
@@ -83,7 +80,7 @@ func init() {
 		kingpin.Parse()
 	})
 
-	AppConfiguration = &AppConfig{
+	AppConfig = &AppConfiguration{
 		Port:            *port,
 		AccessLog:       *accessLog,
 		ApplicationLog:  *applicationLog,
@@ -99,14 +96,9 @@ func init() {
 	}
 }
 
-//GetAppConfig parses args and converts 'em to AppConfig
-func GetAppConfig() AppConfig {
-	return *AppConfiguration
-}
-
 //GetAccessLogger logger for access log
 func GetAccessLogger() *log.Logger {
-	accessLog := GetAppConfig().AccessLog
+	accessLog := AppConfig.AccessLog
 	var logDestination = getLogDestination(accessLog)
 
 	if accessLogger == nil {
@@ -118,7 +110,7 @@ func GetAccessLogger() *log.Logger {
 
 //GetApplicationLogger main app logger
 func GetApplicationLogger() *logrus.Logger {
-	applicationLog := GetAppConfig().ApplicationLog
+	applicationLog := AppConfig.ApplicationLog
 	logDestination := getLogDestination(applicationLog)
 	writer := io.MultiWriter(logDestination)
 
@@ -136,7 +128,7 @@ func GetApplicationLogger() *logrus.Logger {
 
 //IsPromMetricsModuleEnabled says if PromMetrics module is enabled or not, based on activation flag.
 func IsPromMetricsModuleEnabled() bool {
-	return GetAppConfig().PromMetrics.Enabled
+	return AppConfig.PromMetrics.Enabled
 }
 
 func getBroadcaster() *util.Broadcaster {
