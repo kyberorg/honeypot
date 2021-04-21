@@ -11,14 +11,15 @@ import (
 	"sync"
 )
 
+//public fields
 var (
 	// AppConfig object holding application configuration
-	AppConfig *AppConfiguration
+	AppConfig *applicationConfiguration
 	//LoginAttemptChannel for sending and receiving dto.LoginAttempt objects
 	LoginAttemptChannel = getBroadcaster()
 )
 
-//core params
+//core flags
 var (
 	port = kingpin.Flag("port", "Port we start at").Short('p').
 		Envar("PORT").Default("22").Uint16()
@@ -32,7 +33,7 @@ var (
 		"If set, app won't generate hostkey at start-up").Bool()
 )
 
-//prom metrics params
+//prometheus metrics module flags
 var (
 	promMetricsEnabled = kingpin.Flag("prom-metrics-enable", "Enables Prometheus Metrics Module").Bool()
 	promMetricsPort    = kingpin.Flag("prom-metrics-port", "Port for serving metrics").Default("2112").
@@ -42,6 +43,7 @@ var (
 	promMetricsPrefix = kingpin.Flag("prom-metrics-prefix", "Custom metrics prefix").String()
 )
 
+//internal vars
 var (
 	once              sync.Once
 	accessLogger      *log.Logger
@@ -49,8 +51,8 @@ var (
 	broadcasterObject *util.Broadcaster
 )
 
-//AppConfiguration application configuration values
-type AppConfiguration struct {
+//applicationConfiguration application configuration values
+type applicationConfiguration struct {
 	//SSH Port
 	Port uint16
 	//Access Log filename
@@ -80,7 +82,7 @@ func init() {
 		kingpin.Parse()
 	})
 
-	AppConfig = &AppConfiguration{
+	AppConfig = &applicationConfiguration{
 		Port:            *port,
 		AccessLog:       *accessLog,
 		ApplicationLog:  *applicationLog,
