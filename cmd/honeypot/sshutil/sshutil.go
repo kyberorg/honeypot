@@ -24,9 +24,9 @@ const (
 //HostKey generates or reads host key file, used to identify server
 func HostKey() (gossh.Signer, error) {
 	var hostKeyFile string
-	if config.AppConfig.HostKey != "" {
-		hostKeyFile = config.AppConfig.HostKey
-	} else if config.AppConfig.GenerateHostKey {
+	if config.GetAppConfig().HostKey != "" {
+		hostKeyFile = config.GetAppConfig().HostKey
+	} else if config.GetAppConfig().GenerateHostKey {
 		hostKeyFile = os.TempDir() + string(os.PathSeparator) + "honeypot.id_rsa"
 		if !util.IsFileExists(hostKeyFile) {
 			privateKey, err := rsa.GenerateKey(rand.Reader, 2048)

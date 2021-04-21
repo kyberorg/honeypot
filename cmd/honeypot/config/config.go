@@ -11,14 +11,6 @@ import (
 	"sync"
 )
 
-//public fields
-var (
-	// AppConfig object holding application configuration
-	AppConfig *applicationConfiguration
-	//LoginAttemptChannel for sending and receiving dto.LoginAttempt objects
-	LoginAttemptChannel = getBroadcaster()
-)
-
 //core flags
 var (
 	port = kingpin.Flag("port", "Port we start at").Short('p').
@@ -46,9 +38,10 @@ var (
 //internal vars
 var (
 	once              sync.Once
+	appConfig         *applicationConfiguration
+	broadcasterObject *util.Broadcaster
 	accessLogger      *log.Logger
 	applicationLogger *logrus.Logger
-	broadcasterObject *util.Broadcaster
 )
 
 //applicationConfiguration application configuration values
@@ -79,10 +72,13 @@ type PromMetrics struct {
 
 func init() {
 	once.Do(func() {
+		//parse flags
 		kingpin.Parse()
+		//init broadcaster
+		initBroadcaster()
 	})
 
-	AppConfig = &applicationConfiguration{
+	appConfig = &applicationConfiguration{
 		Port:            *port,
 		AccessLog:       *accessLog,
 		ApplicationLog:  *applicationLog,
@@ -98,9 +94,18 @@ func init() {
 	}
 }
 
+//GetAppConfig returns application configuration object
+func GetAppConfig() *applicationConfiguration {
+	return appConfig
+}
+
+func GetLoginAttemptChannel() *util.Broadcaster {
+	return broadcasterObject
+}
+
 //GetAccessLogger logger for access log
 func GetAccessLogger() *log.Logger {
-	accessLog := AppConfig.AccessLog
+	accessLog := appConfig.AccessLog
 	var logDestination = getLogDestination(accessLog)
 
 	if accessLogger == nil {
@@ -112,7 +117,7 @@ func GetAccessLogger() *log.Logger {
 
 //GetApplicationLogger main app logger
 func GetApplicationLogger() *logrus.Logger {
-	applicationLog := AppConfig.ApplicationLog
+	applicationLog := appConfig.ApplicationLog
 	logDestination := getLogDestination(applicationLog)
 	writer := io.MultiWriter(logDestination)
 
@@ -130,15 +135,12 @@ func GetApplicationLogger() *logrus.Logger {
 
 //IsPromMetricsModuleEnabled says if PromMetrics module is enabled or not, based on activation flag.
 func IsPromMetricsModuleEnabled() bool {
-	return AppConfig.PromMetrics.Enabled
+	return appConfig.PromMetrics.Enabled
 }
 
-func getBroadcaster() *util.Broadcaster {
-	if broadcasterObject == nil {
-		broadcasterObject = util.NewBroadcaster()
-		go broadcasterObject.Start()
-	}
-	return broadcasterObject
+func initBroadcaster() {
+	broadcasterObject = util.NewBroadcaster()
+	go broadcasterObject.Start()
 }
 
 //log to file or os.Stdout

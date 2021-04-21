@@ -21,7 +21,7 @@ type MetricsWriter struct {
 func NewMetricsWriter() *MetricsWriter {
 	return &MetricsWriter{
 		connectionsCounter: 0,
-		messageChannel:     config.LoginAttemptChannel.Subscribe(),
+		messageChannel:     config.GetLoginAttemptChannel().Subscribe(),
 		log:                config.GetApplicationLogger(),
 		uniqueIPs:          make([]string, 0),
 	}

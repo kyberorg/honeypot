@@ -32,7 +32,7 @@ func main() {
 		}
 	}
 
-	portString := strconv.Itoa(int(config.AppConfig.Port))
+	portString := strconv.Itoa(int(config.GetAppConfig().Port))
 
 	sshServer := &ssh.Server{
 		Addr:            ":" + portString,
@@ -46,8 +46,8 @@ func main() {
 	log.Println("Starting SSH Server at port", portString)
 	log.Println("ready to access connections")
 
-	if config.AppConfig.AccessLog != "" {
-		log.Println("Logging connections to", config.AppConfig.AccessLog)
+	if config.GetAppConfig().AccessLog != "" {
+		log.Println("Logging connections to", config.GetAppConfig().AccessLog)
 	}
 
 	if config.IsPromMetricsModuleEnabled() {
@@ -80,7 +80,7 @@ func passwordHandler(ctx ssh.Context, password string) bool {
 		IP:       ip,
 	}
 
-	config.LoginAttemptChannel.Send(&loginAttempt)
+	config.GetLoginAttemptChannel().Send(&loginAttempt)
 
 	//small delay to emulate "real" SSH
 	time.Sleep(1 * time.Second)

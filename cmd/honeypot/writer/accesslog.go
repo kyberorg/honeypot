@@ -12,7 +12,7 @@ type AccessLogWriter struct {
 
 func NewAccessLogWriter() *AccessLogWriter {
 	return &AccessLogWriter{
-		messageChannel: config.LoginAttemptChannel.Subscribe(),
+		messageChannel: config.GetLoginAttemptChannel().Subscribe(),
 	}
 }
 
