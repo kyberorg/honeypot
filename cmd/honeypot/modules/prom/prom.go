@@ -3,6 +3,7 @@ package prom
 import (
 	"github.com/kyberorg/honeypot/cmd/honeypot/config"
 	"github.com/kyberorg/honeypot/cmd/honeypot/dto"
+	"github.com/kyberorg/honeypot/cmd/honeypot/logger"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -15,13 +16,13 @@ import (
 var (
 	once          sync.Once
 	singleHandler *PrometheusMetricsHandler
+	log           *logrus.Logger
 )
 
 type PrometheusMetricsHandler struct {
 	connectionsCounter  prometheus.Counter
 	uniqueSourceCounter prometheus.Counter
 	messageChannel      chan *dto.LoginAttempt
-	log                 *logrus.Logger
 	uniqueIPs           []string
 }
 
@@ -32,6 +33,8 @@ const (
 )
 
 func init() {
+	log = logger.GetApplicationLogger()
+
 	prefix := getPrefix()
 
 	singleHandler = &PrometheusMetricsHandler{
@@ -45,7 +48,6 @@ func init() {
 		}),
 
 		messageChannel: config.GetLoginAttemptChannel().Subscribe(),
-		log:            config.GetApplicationLogger(),
 		uniqueIPs:      make([]string, 0),
 	}
 }
@@ -59,12 +61,12 @@ func (h *PrometheusMetricsHandler) StartMetricsServer() {
 		port := strconv.Itoa(int(config.GetAppConfig().PromMetrics.Port))
 		path := config.GetAppConfig().PromMetrics.Path
 
-		h.log.Printf("Starting metrics server at port %s", port)
+		log.Printf("Starting metrics server at port %s", port)
 
 		http.Handle(path, promhttp.Handler())
 		err := http.ListenAndServe(":"+port, nil)
 		if err != nil {
-			h.log.Fatalln("Unable to start prometheus metrics server." +
+			log.Fatalln("Unable to start prometheus metrics server." +
 				"Since you enabled prom module, this is probably not what you want to expect")
 		}
 	})

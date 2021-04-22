@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/kyberorg/honeypot/cmd/honeypot/config"
 	"github.com/kyberorg/honeypot/cmd/honeypot/dto"
+	"github.com/kyberorg/honeypot/cmd/honeypot/logger"
 )
 
 type AccessLogWriter struct {
@@ -20,7 +21,7 @@ func (alw *AccessLogWriter) WriteToLog() {
 	for collectedData := range alw.messageChannel {
 		collectedDataJson, _ := json.Marshal(collectedData)
 
-		accessLogger := config.GetAccessLogger()
+		accessLogger := logger.GetAccessLogger()
 		accessLogger.Println(string(collectedDataJson))
 	}
 }
