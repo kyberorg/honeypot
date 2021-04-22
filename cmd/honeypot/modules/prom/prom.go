@@ -44,7 +44,7 @@ func init() {
 			Help: "Number of unique sources",
 		}),
 
-		messageChannel: config.LoginAttemptChannel.Subscribe(),
+		messageChannel: config.GetLoginAttemptChannel().Subscribe(),
 		log:            config.GetApplicationLogger(),
 		uniqueIPs:      make([]string, 0),
 	}

@@ -8,8 +8,10 @@ import (
 	"io"
 	"log"
 	"os"
+	"sync"
 )
 
+//core flags
 var (
 	port = kingpin.Flag("port", "Port we start at").Short('p').
 		Envar("PORT").Default("22").Uint16()
@@ -23,7 +25,7 @@ var (
 		"If set, app won't generate hostkey at start-up").Bool()
 )
 
-//prom metrics params
+//prometheus metrics module flags
 var (
 	promMetricsEnabled = kingpin.Flag("prom-metrics-enable", "Enables Prometheus Metrics Module").Bool()
 	promMetricsPort    = kingpin.Flag("prom-metrics-port", "Port for serving metrics").Default("2112").
@@ -33,23 +35,17 @@ var (
 	promMetricsPrefix = kingpin.Flag("prom-metrics-prefix", "Custom metrics prefix").String()
 )
 
-//LoginAttemptChannel for sending and receiving dto.LoginAttempt objects
-var LoginAttemptChannel = getBroadcaster()
+//internal vars
+var (
+	once              sync.Once
+	appConfig         *applicationConfiguration
+	broadcasterObject *util.Broadcaster
+	accessLogger      *log.Logger
+	applicationLogger *logrus.Logger
+)
 
-//logger for access log
-var accessLogger *log.Logger
-
-//application logger
-var applicationLogger *logrus.Logger
-
-//are params already parsed
-var alreadyParsed = false
-
-//singleton keeper
-var broadcasterObject *util.Broadcaster
-
-//AppConfig application configuration values
-type AppConfig struct {
+//applicationConfiguration application configuration values
+type applicationConfiguration struct {
 	//SSH Port
 	Port uint16
 	//Access Log filename
@@ -74,14 +70,15 @@ type PromMetrics struct {
 	Prefix  string
 }
 
-//GetAppConfig parses args and converts 'em to AppConfig
-func GetAppConfig() AppConfig {
-	if !alreadyParsed {
+func init() {
+	once.Do(func() {
+		//parse flags
 		kingpin.Parse()
-		alreadyParsed = true
-	}
+		//init broadcaster
+		initBroadcaster()
+	})
 
-	return AppConfig{
+	appConfig = &applicationConfiguration{
 		Port:            *port,
 		AccessLog:       *accessLog,
 		ApplicationLog:  *applicationLog,
@@ -97,9 +94,18 @@ func GetAppConfig() AppConfig {
 	}
 }
 
+//GetAppConfig returns application configuration object
+func GetAppConfig() *applicationConfiguration {
+	return appConfig
+}
+
+func GetLoginAttemptChannel() *util.Broadcaster {
+	return broadcasterObject
+}
+
 //GetAccessLogger logger for access log
 func GetAccessLogger() *log.Logger {
-	accessLog := GetAppConfig().AccessLog
+	accessLog := appConfig.AccessLog
 	var logDestination = getLogDestination(accessLog)
 
 	if accessLogger == nil {
@@ -111,7 +117,7 @@ func GetAccessLogger() *log.Logger {
 
 //GetApplicationLogger main app logger
 func GetApplicationLogger() *logrus.Logger {
-	applicationLog := GetAppConfig().ApplicationLog
+	applicationLog := appConfig.ApplicationLog
 	logDestination := getLogDestination(applicationLog)
 	writer := io.MultiWriter(logDestination)
 
@@ -129,15 +135,12 @@ func GetApplicationLogger() *logrus.Logger {
 
 //IsPromMetricsModuleEnabled says if PromMetrics module is enabled or not, based on activation flag.
 func IsPromMetricsModuleEnabled() bool {
-	return GetAppConfig().PromMetrics.Enabled
+	return appConfig.PromMetrics.Enabled
 }
 
-func getBroadcaster() *util.Broadcaster {
-	if broadcasterObject == nil {
-		broadcasterObject = util.NewBroadcaster()
-		go broadcasterObject.Start()
-	}
-	return broadcasterObject
+func initBroadcaster() {
+	broadcasterObject = util.NewBroadcaster()
+	go broadcasterObject.Start()
 }
 
 //log to file or os.Stdout
