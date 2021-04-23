@@ -5,23 +5,33 @@ import (
 	"github.com/kyberorg/honeypot/cmd/honeypot/config"
 	"github.com/kyberorg/honeypot/cmd/honeypot/dto"
 	"github.com/kyberorg/honeypot/cmd/honeypot/logger"
+	logg "log"
+)
+
+var (
+	singleAccessLogWriter *AccessLogWriter
 )
 
 type AccessLogWriter struct {
-	messageChannel chan *dto.LoginAttempt
+	loginAttempts chan *dto.LoginAttempt
+	accessLogger  *logg.Logger
 }
 
-func NewAccessLogWriter() *AccessLogWriter {
-	return &AccessLogWriter{
-		messageChannel: config.GetLoginAttemptChannel().Subscribe(),
+func init() {
+	singleAccessLogWriter = &AccessLogWriter{
+		accessLogger:  logger.GetAccessLogger(),
+		loginAttempts: config.GetLoginAttemptBroadcaster().Subscribe(),
 	}
 }
 
-func (alw *AccessLogWriter) WriteToLog() {
-	for collectedData := range alw.messageChannel {
-		collectedDataJson, _ := json.Marshal(collectedData)
+func GetAccessLogWriter() *AccessLogWriter {
+	return singleAccessLogWriter
+}
 
-		accessLogger := logger.GetAccessLogger()
-		accessLogger.Println(string(collectedDataJson))
+func (w *AccessLogWriter) WriteToLog() {
+	for loginAttempt := range w.loginAttempts {
+		jsonObject, _ := json.Marshal(loginAttempt)
+
+		w.accessLogger.Println(string(jsonObject))
 	}
 }

@@ -32,9 +32,9 @@ var (
 
 //internal vars
 var (
-	once              sync.Once
-	appConfig         *applicationConfiguration
-	broadcasterObject *util.Broadcaster
+	once                    sync.Once
+	appConfig               *applicationConfiguration
+	loginAttemptBroadcaster *util.LoginAttemptBroadcaster
 )
 
 //applicationConfiguration application configuration values
@@ -68,7 +68,7 @@ func init() {
 		//parse flags
 		kingpin.Parse()
 		//init broadcaster
-		initBroadcaster()
+		initLoginAttemptBroadcaster()
 	})
 
 	appConfig = &applicationConfiguration{
@@ -92,8 +92,8 @@ func GetAppConfig() *applicationConfiguration {
 	return appConfig
 }
 
-func GetLoginAttemptChannel() *util.Broadcaster {
-	return broadcasterObject
+func GetLoginAttemptBroadcaster() *util.LoginAttemptBroadcaster {
+	return loginAttemptBroadcaster
 }
 
 //IsPromMetricsModuleEnabled says if PromMetrics module is enabled or not, based on activation flag.
@@ -101,7 +101,7 @@ func IsPromMetricsModuleEnabled() bool {
 	return appConfig.PromMetrics.Enabled
 }
 
-func initBroadcaster() {
-	broadcasterObject = util.NewBroadcaster()
-	go broadcasterObject.Start()
+func initLoginAttemptBroadcaster() {
+	loginAttemptBroadcaster = util.NewLoginAttemptBroadcaster()
+	go loginAttemptBroadcaster.Start()
 }

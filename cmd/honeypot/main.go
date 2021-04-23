@@ -56,8 +56,8 @@ func main() {
 }
 
 func registerWriters() {
-	go writer.NewAccessLogWriter().WriteToLog()
-	go writer.NewMetricsWriter().RecordMetric()
+	go writer.GetAccessLogWriter().WriteToLog()
+	go writer.GetMetricsWriter().RecordMetric()
 	if config.IsPromMetricsModuleEnabled() {
 		go prom.GetPrometheusMetricsHandler().RecordMetrics()
 	}
@@ -78,7 +78,7 @@ func passwordHandler(ctx ssh.Context, password string) bool {
 		IP:       ip,
 	}
 
-	config.GetLoginAttemptChannel().Send(&loginAttempt)
+	config.GetLoginAttemptBroadcaster().Send(&loginAttempt)
 
 	//small delay to emulate "real" SSH
 	time.Sleep(1 * time.Second)

@@ -8,33 +8,38 @@ import (
 	"sync/atomic"
 )
 
-//TODO replace it with prometheus metrics
+//TODO replace it with raw metrics module
 
 var log = logger.GetApplicationLogger()
+var singleMetricsWriter *MetricsWriter
 
 type MetricsWriter struct {
 	connectionsCounter uint64
-	messageChannel     chan *dto.LoginAttempt
+	loginAttempts      chan *dto.LoginAttempt
 	uniqueIPs          []string
 	wg                 sync.WaitGroup
 }
 
-func NewMetricsWriter() *MetricsWriter {
-	return &MetricsWriter{
+func init() {
+	singleMetricsWriter = &MetricsWriter{
 		connectionsCounter: 0,
-		messageChannel:     config.GetLoginAttemptChannel().Subscribe(),
+		loginAttempts:      config.GetLoginAttemptBroadcaster().Subscribe(),
 		uniqueIPs:          make([]string, 0),
 	}
 }
 
+func GetMetricsWriter() *MetricsWriter {
+	return singleMetricsWriter
+}
+
 func (w *MetricsWriter) RecordMetric() {
-	for collectedData := range w.messageChannel {
+	for loginAttempt := range w.loginAttempts {
 		w.wg.Add(1)
 		atomic.AddUint64(&w.connectionsCounter, 1)
 		w.wg.Done()
 
-		if w.isNewIPConnected(collectedData.IP) {
-			w.uniqueIPs = append(w.uniqueIPs, collectedData.IP)
+		if w.isNewIPConnected(loginAttempt.IP) {
+			w.uniqueIPs = append(w.uniqueIPs, loginAttempt.IP)
 		}
 
 		log.Printf("total number of connections: %d (unique sources %d)",

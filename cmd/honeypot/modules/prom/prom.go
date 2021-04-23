@@ -22,7 +22,7 @@ var (
 type PrometheusMetricsHandler struct {
 	connectionsCounter  prometheus.Counter
 	uniqueSourceCounter prometheus.Counter
-	messageChannel      chan *dto.LoginAttempt
+	loginAttempts       chan *dto.LoginAttempt
 	uniqueIPs           []string
 }
 
@@ -45,8 +45,8 @@ func init() {
 			Help: "Number of unique sources",
 		}),
 
-		messageChannel: config.GetLoginAttemptChannel().Subscribe(),
-		uniqueIPs:      make([]string, 0),
+		loginAttempts: config.GetLoginAttemptBroadcaster().Subscribe(),
+		uniqueIPs:     make([]string, 0),
 	}
 }
 
@@ -71,7 +71,7 @@ func (h *PrometheusMetricsHandler) StartMetricsServer() {
 }
 
 func (h *PrometheusMetricsHandler) RecordMetrics() {
-	for loginAttempt := range h.messageChannel {
+	for loginAttempt := range h.loginAttempts {
 		h.connectionsCounter.Inc()
 
 		//adding uniq ips list if unique
