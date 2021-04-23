@@ -2,12 +2,7 @@ package config
 
 import (
 	"github.com/kyberorg/honeypot/cmd/honeypot/util"
-	"github.com/sirupsen/logrus"
-	"github.com/t-tomalak/logrus-easy-formatter"
 	"gopkg.in/alecthomas/kingpin.v2"
-	"io"
-	"log"
-	"os"
 	"sync"
 )
 
@@ -40,8 +35,6 @@ var (
 	once              sync.Once
 	appConfig         *applicationConfiguration
 	broadcasterObject *util.Broadcaster
-	accessLogger      *log.Logger
-	applicationLogger *logrus.Logger
 )
 
 //applicationConfiguration application configuration values
@@ -103,36 +96,6 @@ func GetLoginAttemptChannel() *util.Broadcaster {
 	return broadcasterObject
 }
 
-//GetAccessLogger logger for access log
-func GetAccessLogger() *log.Logger {
-	accessLog := appConfig.AccessLog
-	var logDestination = getLogDestination(accessLog)
-
-	if accessLogger == nil {
-		writer := io.MultiWriter(logDestination)
-		accessLogger = log.New(writer, "", 0)
-	}
-	return accessLogger
-}
-
-//GetApplicationLogger main app logger
-func GetApplicationLogger() *logrus.Logger {
-	applicationLog := appConfig.ApplicationLog
-	logDestination := getLogDestination(applicationLog)
-	writer := io.MultiWriter(logDestination)
-
-	if applicationLogger == nil {
-		applicationLogger = logrus.New()
-		applicationLogger.SetFormatter(&easy.Formatter{
-			TimestampFormat: "02/01/2006 15:04:05-0700",
-			LogFormat:       "%time% - %msg%\n",
-		})
-
-		applicationLogger.SetOutput(writer)
-	}
-	return applicationLogger
-}
-
 //IsPromMetricsModuleEnabled says if PromMetrics module is enabled or not, based on activation flag.
 func IsPromMetricsModuleEnabled() bool {
 	return appConfig.PromMetrics.Enabled
@@ -141,19 +104,4 @@ func IsPromMetricsModuleEnabled() bool {
 func initBroadcaster() {
 	broadcasterObject = util.NewBroadcaster()
 	go broadcasterObject.Start()
-}
-
-//log to file or os.Stdout
-func getLogDestination(logFile string) *os.File {
-	var logLocation *os.File
-	if logFile == "" {
-		logLocation = os.Stdout
-	} else {
-		var logOpenError error
-		logLocation, logOpenError = os.OpenFile(logFile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
-		if logOpenError != nil {
-			log.Fatalln("Unable to open log file" + logOpenError.Error())
-		}
-	}
-	return logLocation
 }

@@ -4,20 +4,18 @@ import (
 	"github.com/gliderlabs/ssh"
 	"github.com/kyberorg/honeypot/cmd/honeypot/config"
 	"github.com/kyberorg/honeypot/cmd/honeypot/dto"
+	"github.com/kyberorg/honeypot/cmd/honeypot/logger"
 	"github.com/kyberorg/honeypot/cmd/honeypot/modules/prom"
 	"github.com/kyberorg/honeypot/cmd/honeypot/sshutil"
 	"github.com/kyberorg/honeypot/cmd/honeypot/util"
 	"github.com/kyberorg/honeypot/cmd/honeypot/writer"
-	"github.com/sirupsen/logrus"
 	"strconv"
 	"time"
 )
 
-var log *logrus.Logger
+var log = logger.GetApplicationLogger()
 
 func main() {
-	//override application logger
-	log = config.GetApplicationLogger()
 
 	//register writers (functions receiving published by passwordHandler object)
 	registerWriters()
