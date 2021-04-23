@@ -4,21 +4,19 @@ import (
 	"github.com/kyberorg/honeypot/cmd/honeypot/config"
 	"github.com/kyberorg/honeypot/cmd/honeypot/dto"
 	"github.com/kyberorg/honeypot/cmd/honeypot/logger"
-	"github.com/sirupsen/logrus"
 	"sync"
 	"sync/atomic"
 )
 
 //TODO replace it with prometheus metrics
 
-var log *logrus.Logger = logger.GetApplicationLogger()
+var log = logger.GetApplicationLogger()
 
 type MetricsWriter struct {
 	connectionsCounter uint64
 	messageChannel     chan *dto.LoginAttempt
-
-	uniqueIPs []string
-	wg        sync.WaitGroup
+	uniqueIPs          []string
+	wg                 sync.WaitGroup
 }
 
 func NewMetricsWriter() *MetricsWriter {

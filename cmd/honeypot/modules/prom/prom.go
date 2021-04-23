@@ -7,16 +7,16 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"github.com/sirupsen/logrus"
 	"net/http"
 	"strconv"
 	"sync"
 )
 
+var log = logger.GetApplicationLogger()
+
 var (
 	once          sync.Once
 	singleHandler *PrometheusMetricsHandler
-	log           *logrus.Logger
 )
 
 type PrometheusMetricsHandler struct {
@@ -33,8 +33,6 @@ const (
 )
 
 func init() {
-	log = logger.GetApplicationLogger()
-
 	prefix := getPrefix()
 
 	singleHandler = &PrometheusMetricsHandler{
