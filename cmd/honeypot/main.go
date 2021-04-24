@@ -16,18 +16,13 @@ import (
 var log = logger.GetApplicationLogger()
 
 func main() {
-
 	//register writers (functions receiving published by passwordHandler object)
 	registerWriters()
 
 	//getting HostKey
 	hostKey, hostKeyErr := sshutil.HostKey()
-	if hostKeyErr != nil {
-		if hostKeyErr.Error() == sshutil.NoHostKeyMarker {
-			hostKey = nil
-		} else {
-			log.Fatalln(hostKeyErr)
-		}
+	if hostKeyErr != nil && hostKeyErr.Error() != sshutil.SkipMarker {
+		log.Fatalln(hostKeyErr)
 	}
 
 	portString := strconv.Itoa(int(config.GetAppConfig().Port))
