@@ -47,22 +47,31 @@ func LookupIP(ipString string) (*GeoInfo, error) {
 		return nil, err
 	}
 
-	return &GeoInfo{
-		Coordinates: Coordinates{
+	geoInfo := &GeoInfo{}
+	if record.Location.Latitude != 0 && record.Location.Longitude != 0 {
+		geoInfo.Coordinates = Coordinates{
 			Latitude:  record.Location.Latitude,
 			Longitude: record.Location.Longitude,
-		},
-		Country: Country{
+		}
+	}
+
+	if record.Country.IsoCode != "" && len(record.Country.Names) > 0 {
+		geoInfo.Country = Country{
 			Code: record.Country.IsoCode,
-			Name: record.Country.Names["en-US"],
-		},
-		Region: Region{
-			Code: "",
-		},
-		City: City{
-			Name: record.City.Names["en-US"],
-		},
-	}, nil
+			Name: record.Country.Names["en"],
+		}
+	}
+
+	if len(record.Subdivisions) > 0 {
+		geoInfo.Region.Name = record.Subdivisions[0].Names["en"]
+		geoInfo.Region.Code = record.Subdivisions[0].IsoCode
+	}
+
+	if len(record.City.Names) > 0 {
+		geoInfo.City.Name = record.City.Names["en"]
+	}
+
+	return geoInfo, nil
 }
 
 func readDatabaseFile(databaseFile string) error {
