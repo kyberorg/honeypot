@@ -30,6 +30,12 @@ var (
 	promMetricsPrefix = kingpin.Flag("prom-metrics-prefix", "Custom metrics prefix").String()
 )
 
+//geoip module flags
+var (
+	geoIpEnabled      = kingpin.Flag("geoip-enable", "Enables GeoIP Module").Bool()
+	geoIpDatabaseFile = kingpin.Flag("geoip-mmdb-file", "Location of MaxMind City MMDB file").String()
+)
+
 //internal vars
 var (
 	once                    sync.Once
@@ -52,6 +58,9 @@ type applicationConfiguration struct {
 
 	//PromMetrics module flags
 	PromMetrics
+
+	//GeoIP module flags
+	GeoIP
 }
 
 //PromMetrics module flags
@@ -61,6 +70,11 @@ type PromMetrics struct {
 	Port    uint16
 	Path    string
 	Prefix  string
+}
+
+type GeoIP struct {
+	Enabled      bool
+	DatabaseFile string
 }
 
 func init() {
@@ -83,6 +97,10 @@ func init() {
 			Port:    *promMetricsPort,
 			Path:    *promMetricsPath,
 			Prefix:  *promMetricsPrefix,
+		},
+		GeoIP: GeoIP{
+			Enabled:      *geoIpEnabled,
+			DatabaseFile: *geoIpDatabaseFile,
 		},
 	}
 }
