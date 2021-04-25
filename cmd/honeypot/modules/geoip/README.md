@@ -33,5 +33,5 @@ and find mmdb file at `/var/lib/GeoIP/GeoLite2-City.mmdb`
 #### DatabaseFile
 * Path to MMDB database
 ```shell
---geoip-mmdb-file=/path/to/city.mmdb
+--geoip-mmdb-file=/path/to/GeoLite2-City.mmdb
 ```
