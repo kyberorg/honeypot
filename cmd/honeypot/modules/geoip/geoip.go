@@ -10,7 +10,6 @@ import (
 )
 
 var (
-	Enabled     bool
 	InitError   error
 	ReadyToWork bool
 )
@@ -19,16 +18,10 @@ const (
 	DatabaseFileNotExist    = "MMDB Database file not exists"
 	DatabaseFileNotReadable = "MMDB Database file is not readable"
 	DatabaseFileCorrupted   = "MMDB Database file is corrupted"
-	ModuleDisabledErr       = "GeoIP module is disabled"
 )
 
 func init() {
-	Enabled = config.GetAppConfig().GeoIP.Enabled
-	if Enabled {
-		InitError = readDatabaseFile(config.GetAppConfig().GeoIP.DatabaseFile)
-	} else {
-		InitError = errors.New(ModuleDisabledErr)
-	}
+	InitError = readDatabaseFile(config.GetAppConfig().GeoIP.DatabaseFile)
 	ReadyToWork = InitError == nil
 }
 

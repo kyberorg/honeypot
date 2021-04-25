@@ -7,8 +7,7 @@ Needs [Maxmind GeoIP2 City-database](https://www.maxmind.com/en/geoip2-city) to 
 * Country (code, name)
 * City name (name)
 * Region (code, name)
-* Coordinates (latitude, longitude)
-
+* Location (latitude, longitude)
 
 ### GeoIP2 database
 Maxmind GeoIP2 database can be downloaded for free from its [official site](https://www.maxmind.com/en/geoip2-city).
@@ -29,13 +28,7 @@ geoipupdate
 ```
 and find mmdb file at `/var/lib/GeoIP/GeoLite2-City.mmdb`
 
-## Usage
-### How to activate
-```shell
---geoip-enabled
-```
-
-### Params
+## Params
 
 #### DatabaseFile
 * Path to MMDB database

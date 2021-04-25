@@ -39,8 +39,7 @@ func (w *AccessLogWriter) WriteToLog() {
 		accessJson := AccessJson{
 			LoginAttempt: loginAttempt,
 		}
-		if geoip.Enabled && geoip.ReadyToWork {
-
+		if geoip.ReadyToWork {
 			geoInfo, err := geoip.LookupIP(loginAttempt.IP)
 			if !geoip.IsEmptyGeoInfo(geoInfo) {
 				accessJson.GeoInfo = geoInfo

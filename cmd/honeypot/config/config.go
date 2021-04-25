@@ -32,7 +32,6 @@ var (
 
 //geoip module flags
 var (
-	geoIpEnabled      = kingpin.Flag("geoip-enable", "Enables GeoIP Module").Bool()
 	geoIpDatabaseFile = kingpin.Flag("geoip-mmdb-file", "Location of MaxMind City MMDB file").String()
 )
 
@@ -73,7 +72,6 @@ type PromMetrics struct {
 }
 
 type GeoIP struct {
-	Enabled      bool
 	DatabaseFile string
 }
 
@@ -99,7 +97,6 @@ func init() {
 			Prefix:  *promMetricsPrefix,
 		},
 		GeoIP: GeoIP{
-			Enabled:      *geoIpEnabled,
 			DatabaseFile: *geoIpDatabaseFile,
 		},
 	}
