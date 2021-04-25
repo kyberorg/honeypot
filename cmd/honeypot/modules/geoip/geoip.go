@@ -49,7 +49,7 @@ func LookupIP(ipString string) (*GeoInfo, error) {
 
 	geoInfo := &GeoInfo{}
 	if record.Location.Latitude != 0 && record.Location.Longitude != 0 {
-		geoInfo.Coordinates = Coordinates{
+		geoInfo.Location = Location{
 			Latitude:  record.Location.Latitude,
 			Longitude: record.Location.Longitude,
 		}
@@ -75,7 +75,7 @@ func LookupIP(ipString string) (*GeoInfo, error) {
 }
 
 func IsEmptyGeoInfo(geoInfo *GeoInfo) bool {
-	return geoInfo.Coordinates.Latitude == 0 || geoInfo.Coordinates.Longitude == 0
+	return geoInfo.Location.Latitude == 0 || geoInfo.Location.Longitude == 0
 }
 
 func readDatabaseFile(databaseFile string) error {

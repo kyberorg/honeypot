@@ -1,13 +1,13 @@
 package geoip
 
 type GeoInfo struct {
-	Coordinates `json:"coordinates"`
-	Country     `json:"country"`
-	Region      `json:"region"`
-	City        `json:"city"`
+	Location `json:"location,omitempty"`
+	Country  `json:"country,omitempty"`
+	Region   `json:"region,omitempty"`
+	City     `json:"city,omitempty"`
 }
 
-type Coordinates struct {
+type Location struct {
 	Latitude  float64 `json:"lat"`
 	Longitude float64 `json:"lon"`
 }
