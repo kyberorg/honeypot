@@ -74,6 +74,10 @@ func LookupIP(ipString string) (*GeoInfo, error) {
 	return geoInfo, nil
 }
 
+func IsEmptyGeoInfo(geoInfo *GeoInfo) bool {
+	return geoInfo.Coordinates.Latitude == 0 || geoInfo.Coordinates.Longitude == 0
+}
+
 func readDatabaseFile(databaseFile string) error {
 	databaseFileExists := util.IsFileExists(databaseFile)
 	if databaseFileExists {

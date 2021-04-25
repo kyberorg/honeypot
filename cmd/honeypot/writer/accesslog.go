@@ -15,7 +15,7 @@ var (
 
 type AccessJson struct {
 	*dto.LoginAttempt
-	*geoip.GeoInfo `json:"geoip"`
+	*geoip.GeoInfo `json:"geoip,omitempty"`
 }
 
 type AccessLogWriter struct {
@@ -35,13 +35,16 @@ func GetAccessLogWriter() *AccessLogWriter {
 }
 
 func (w *AccessLogWriter) WriteToLog() {
-	var err error
 	for loginAttempt := range w.loginAttempts {
 		accessJson := AccessJson{
 			LoginAttempt: loginAttempt,
 		}
 		if geoip.Enabled && geoip.ReadyToWork {
-			accessJson.GeoInfo, err = geoip.LookupIP(loginAttempt.IP)
+
+			geoInfo, err := geoip.LookupIP(loginAttempt.IP)
+			if !geoip.IsEmptyGeoInfo(geoInfo) {
+				accessJson.GeoInfo = geoInfo
+			}
 			if err != nil {
 				log.Println("GeoIP error:", err)
 			}
