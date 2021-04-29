@@ -3,7 +3,6 @@ package prom
 import (
 	"github.com/kyberorg/honeypot/cmd/honeypot/config"
 	"github.com/kyberorg/honeypot/cmd/honeypot/dto"
-	"github.com/kyberorg/honeypot/cmd/honeypot/logger"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -12,7 +11,7 @@ import (
 	"sync"
 )
 
-var log = logger.GetApplicationLogger()
+var log = config.GetApplicationLogger()
 
 var (
 	once          sync.Once

@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"github.com/kyberorg/honeypot/cmd/honeypot/config"
 	"github.com/kyberorg/honeypot/cmd/honeypot/dto"
-	"github.com/kyberorg/honeypot/cmd/honeypot/logger"
 	"github.com/kyberorg/honeypot/cmd/honeypot/modules/geoip"
 	logg "log"
 )
@@ -25,7 +24,7 @@ type AccessLogWriter struct {
 
 func init() {
 	singleAccessLogWriter = &AccessLogWriter{
-		accessLogger:  logger.GetAccessLogger(),
+		accessLogger:  config.GetAccessLogger(),
 		loginAttempts: config.GetLoginAttemptBroadcaster().Subscribe(),
 	}
 }

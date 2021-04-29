@@ -1,21 +1,17 @@
-package logger
+package config
 
 import (
-	"github.com/kyberorg/honeypot/cmd/honeypot/config"
 	"github.com/sirupsen/logrus"
 	easy "github.com/t-tomalak/logrus-easy-formatter"
 	"io"
 	"log"
 	"os"
-	"sync"
 )
 
 var (
 	accessLogger      *log.Logger
 	applicationLogger *logrus.Logger
 )
-
-var once sync.Once
 
 func init() {
 	once.Do(func() {
@@ -35,7 +31,7 @@ func GetApplicationLogger() *logrus.Logger {
 }
 
 func initAccessLogger() {
-	accessLog := config.GetAppConfig().AccessLog
+	accessLog := GetAppConfig().AccessLog
 	var logDestination = getLogDestination(accessLog)
 
 	if accessLogger == nil {
@@ -45,7 +41,7 @@ func initAccessLogger() {
 }
 
 func initApplicationLogger() {
-	applicationLog := config.GetAppConfig().ApplicationLog
+	applicationLog := GetAppConfig().ApplicationLog
 	logDestination := getLogDestination(applicationLog)
 	writer := io.MultiWriter(logDestination)
 
