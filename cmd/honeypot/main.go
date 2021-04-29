@@ -4,7 +4,6 @@ import (
 	"github.com/gliderlabs/ssh"
 	"github.com/kyberorg/honeypot/cmd/honeypot/config"
 	"github.com/kyberorg/honeypot/cmd/honeypot/dto"
-	"github.com/kyberorg/honeypot/cmd/honeypot/logger"
 	"github.com/kyberorg/honeypot/cmd/honeypot/modules/prom"
 	"github.com/kyberorg/honeypot/cmd/honeypot/sshutil"
 	"github.com/kyberorg/honeypot/cmd/honeypot/util"
@@ -13,7 +12,7 @@ import (
 	"time"
 )
 
-var log = logger.GetApplicationLogger()
+var log = config.GetApplicationLogger()
 
 func main() {
 	//register writers (functions receiving published by passwordHandler object)

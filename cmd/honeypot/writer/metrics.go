@@ -3,14 +3,13 @@ package writer
 import (
 	"github.com/kyberorg/honeypot/cmd/honeypot/config"
 	"github.com/kyberorg/honeypot/cmd/honeypot/dto"
-	"github.com/kyberorg/honeypot/cmd/honeypot/logger"
 	"sync"
 	"sync/atomic"
 )
 
 //TODO replace it with raw metrics module
 
-var log = logger.GetApplicationLogger()
+var log = config.GetApplicationLogger()
 var singleMetricsWriter *MetricsWriter
 
 type MetricsWriter struct {
