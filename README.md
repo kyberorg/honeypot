@@ -53,7 +53,7 @@ Module that exposes prometheus metrics.
 [Module Readme](cmd/honeypot/modules/prom/README.md)
 
 ```shell
---prom-metrics-enable
+--with-prom-metrics
 ```
 
 
