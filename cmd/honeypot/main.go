@@ -5,6 +5,7 @@ import (
 	"github.com/kyberorg/honeypot/cmd/honeypot/config"
 	"github.com/kyberorg/honeypot/cmd/honeypot/dto"
 	"github.com/kyberorg/honeypot/cmd/honeypot/modules/prom"
+	"github.com/kyberorg/honeypot/cmd/honeypot/modules/rawmetrics"
 	"github.com/kyberorg/honeypot/cmd/honeypot/sshutil"
 	"github.com/kyberorg/honeypot/cmd/honeypot/util"
 	"github.com/kyberorg/honeypot/cmd/honeypot/writer"
@@ -51,9 +52,11 @@ func main() {
 
 func registerWriters() {
 	go writer.GetAccessLogWriter().WriteToLog()
-	go writer.GetMetricsWriter().RecordMetric()
 	if config.IsPromMetricsModuleEnabled() {
 		go prom.GetPrometheusMetricsHandler().RecordMetrics()
+	}
+	if config.IsRawMetricsModuleEnabled() {
+		go rawmetrics.GetMetricsWriter().RecordMetric()
 	}
 }
 

@@ -1,4 +1,4 @@
-package writer
+package rawmetrics
 
 import (
 	"github.com/kyberorg/honeypot/cmd/honeypot/config"
@@ -7,15 +7,19 @@ import (
 	"sync/atomic"
 )
 
-//TODO replace it with raw metrics module
-
 var log = config.GetApplicationLogger()
 var singleMetricsWriter *MetricsWriter
+
+const (
+	// Prefix for all metrics.
+	defaultPrefix = "honeypot"
+)
 
 type MetricsWriter struct {
 	connectionsCounter uint64
 	loginAttempts      chan *dto.LoginAttempt
 	uniqueIPs          []string
+	prefix             string
 	wg                 sync.WaitGroup
 }
 
@@ -24,6 +28,7 @@ func init() {
 		connectionsCounter: 0,
 		loginAttempts:      config.GetLoginAttemptBroadcaster().Subscribe(),
 		uniqueIPs:          make([]string, 0),
+		prefix:             getPrefix(),
 	}
 }
 
@@ -55,4 +60,12 @@ func (w *MetricsWriter) isNewIPConnected(ip string) bool {
 		}
 	}
 	return true
+}
+
+func getPrefix() string {
+	metricsPrefix := config.GetAppConfig().RawMetrics.Prefix
+	if metricsPrefix == "" {
+		metricsPrefix = defaultPrefix
+	}
+	return metricsPrefix
 }
