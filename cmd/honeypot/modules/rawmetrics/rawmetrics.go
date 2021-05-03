@@ -7,8 +7,10 @@ import (
 	"sync/atomic"
 )
 
-var log = config.GetApplicationLogger()
-var singleMetricsWriter *MetricsWriter
+var (
+	log                 = config.GetApplicationLogger()
+	singleMetricsWriter *MetricsWriter
+)
 
 const (
 	// Prefix for all metrics.

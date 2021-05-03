@@ -9,6 +9,7 @@ import (
 )
 
 var (
+	log                   = config.GetApplicationLogger()
 	singleAccessLogWriter *AccessLogWriter
 )
 
