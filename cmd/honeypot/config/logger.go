@@ -14,10 +14,8 @@ var (
 )
 
 func init() {
-	once.Do(func() {
-		initApplicationLogger()
-		initAccessLogger()
-	})
+	initApplicationLogger()
+	initAccessLogger()
 }
 
 //GetAccessLogger logger for access log
