@@ -7,10 +7,8 @@ var (
 )
 
 func init() {
-	once.Do(func() {
-		//init broadcaster
-		initLoginAttemptBroadcaster()
-	})
+	//init broadcaster
+	initLoginAttemptBroadcaster()
 }
 
 func GetLoginAttemptBroadcaster() *util.LoginAttemptBroadcaster {
