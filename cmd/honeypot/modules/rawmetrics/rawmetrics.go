@@ -52,7 +52,7 @@ func (w *MetricsWriter) RecordMetric() {
 			w.uniqueIPs = append(w.uniqueIPs, loginAttempt.IP)
 		}
 
-		if logToFile() {
+		if config.LogRawMetricsToFile() {
 			connectionsMetric := w.prefix + connectionPostfix + ": " + strconv.Itoa(int(w.connectionsCounter))
 			uniqueIpMetric := w.prefix + uniqueSourcesPostfix + ": " + strconv.Itoa(len(w.uniqueIPs))
 
@@ -84,8 +84,4 @@ func getPrefix() string {
 		metricsPrefix = defaultPrefix
 	}
 	return metricsPrefix
-}
-
-func logToFile() bool {
-	return len(config.GetAppConfig().File) > 0
 }

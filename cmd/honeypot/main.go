@@ -43,6 +43,10 @@ func main() {
 		log.Println("Logging connections to", config.GetAppConfig().AccessLog)
 	}
 
+	if config.IsRawMetricsModuleEnabled() && config.LogRawMetricsToFile() {
+		log.Println("Logging metrics to", config.GetAppConfig().RawMetrics.File)
+	}
+
 	if config.IsPromMetricsModuleEnabled() {
 		go prom.GetPrometheusMetricsHandler().StartMetricsServer()
 	}

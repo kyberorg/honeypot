@@ -130,3 +130,8 @@ func IsPromMetricsModuleEnabled() bool {
 func IsRawMetricsModuleEnabled() bool {
 	return appConfig.RawMetrics.Enabled
 }
+
+//LogRawMetricsToFile defines if RawMetrics should be written to file or not, based on file flag
+func LogRawMetricsToFile() bool {
+	return appConfig.RawMetrics.File != ""
+}
