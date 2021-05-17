@@ -2,7 +2,6 @@ package config
 
 import (
 	"gopkg.in/alecthomas/kingpin.v2"
-	"sync"
 )
 
 //core flags
@@ -36,7 +35,6 @@ var (
 
 //internal vars
 var (
-	once      sync.Once
 	appConfig *applicationConfiguration
 )
 
@@ -74,10 +72,8 @@ type GeoIP struct {
 }
 
 func init() {
-	once.Do(func() {
-		//parse flags
-		kingpin.Parse()
-	})
+	//parse flags
+	kingpin.Parse()
 
 	appConfig = &applicationConfiguration{
 		Port:            *port,
