@@ -3,6 +3,8 @@ package rawmetrics
 import (
 	"github.com/kyberorg/honeypot/cmd/honeypot/config"
 	"github.com/kyberorg/honeypot/cmd/honeypot/dto"
+	"io/ioutil"
+	"strconv"
 	"sync"
 	"sync/atomic"
 )
@@ -14,7 +16,9 @@ var (
 
 const (
 	// Prefix for all metrics.
-	defaultPrefix = "honeypot"
+	defaultPrefix        = "honeypot"
+	connectionPostfix    = "_connections"
+	uniqueSourcesPostfix = "_unique_sources"
 )
 
 type MetricsWriter struct {
@@ -48,10 +52,20 @@ func (w *MetricsWriter) RecordMetric() {
 			w.uniqueIPs = append(w.uniqueIPs, loginAttempt.IP)
 		}
 
-		log.Printf("total number of connections: %d (unique sources %d)",
-			w.connectionsCounter, len(w.uniqueIPs))
+		if logToFile() {
+			connectionsMetric := w.prefix + connectionPostfix + ": " + strconv.Itoa(int(w.connectionsCounter))
+			uniqueIpMetric := w.prefix + uniqueSourcesPostfix + ": " + strconv.Itoa(len(w.uniqueIPs))
 
-		//TODO map<String(IP), attempts>
+			record := []byte(connectionsMetric + "\n" + uniqueIpMetric + "\n")
+			err := ioutil.WriteFile(config.GetAppConfig().File, record, 0644)
+			if err != nil {
+				log.Fatalln("Unable to write raw metrics to " + config.GetAppConfig().File +
+					"Since you enabled raw module, this is probably not what you want to expect.")
+			}
+		} else {
+			log.Printf("total number of connections: %d (unique sources %d)",
+				w.connectionsCounter, len(w.uniqueIPs))
+		}
 	}
 }
 
@@ -70,4 +84,8 @@ func getPrefix() string {
 		metricsPrefix = defaultPrefix
 	}
 	return metricsPrefix
+}
+
+func logToFile() bool {
+	return len(config.GetAppConfig().File) > 0
 }
