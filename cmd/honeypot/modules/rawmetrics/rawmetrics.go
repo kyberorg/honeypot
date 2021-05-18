@@ -59,8 +59,8 @@ func (w *MetricsWriter) RecordMetric() {
 			record := []byte(connectionsMetric + "\n" + uniqueIpMetric + "\n")
 			err := ioutil.WriteFile(config.GetAppConfig().File, record, 0644)
 			if err != nil {
-				log.Fatalln("Unable to write raw metrics to " + config.GetAppConfig().File +
-					"Since you enabled raw module, this is probably not what you want to expect.")
+				log.Fatalln("Unable to write raw metrics to " + config.GetAppConfig().RawMetrics.File +
+					"Since you enabled raw metrics module, this is probably not what you want to expect.")
 			}
 		} else {
 			log.Printf("total number of connections: %d (unique sources %d)",
