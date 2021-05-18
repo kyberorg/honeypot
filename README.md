@@ -56,4 +56,10 @@ Module that exposes prometheus metrics.
 --with-prom-metrics
 ```
 
+# Raw metrics module
 
+Module that provides application metrics. It writes metrics to stdout (application log) or to file.
+[Module Readme](cmd/honeypot/modules/rawmetrics/README.md)
+```shell
+--with-raw-metrics
+```

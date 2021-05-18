@@ -33,6 +33,13 @@ var (
 	geoIpDatabaseFile = kingpin.Flag("geoip-mmdb-file", "Location of MaxMind City MMDB file").String()
 )
 
+//raw metrics module flags
+var (
+	rawMetricsEnabled = kingpin.Flag("with-raw-metrics", "Enables Raw Metrics Module").Bool()
+	rawMetricsFile    = kingpin.Flag("raw-metrics-file", "File to write metrics to").String()
+	rawMetricsPrefix  = kingpin.Flag("raw-metrics-prefix", "Custom metrics prefix").String()
+)
+
 //internal vars
 var (
 	appConfig *applicationConfiguration
@@ -56,6 +63,9 @@ type applicationConfiguration struct {
 
 	//GeoIP module flags
 	GeoIP
+
+	//RawMetrics module flags
+	RawMetrics
 }
 
 //PromMetrics module flags
@@ -69,6 +79,13 @@ type PromMetrics struct {
 
 type GeoIP struct {
 	DatabaseFile string
+}
+
+//RawMetrics module flags
+type RawMetrics struct {
+	Enabled bool
+	File    string
+	Prefix  string
 }
 
 func init() {
@@ -91,6 +108,11 @@ func init() {
 		GeoIP: GeoIP{
 			DatabaseFile: *geoIpDatabaseFile,
 		},
+		RawMetrics: RawMetrics{
+			Enabled: *rawMetricsEnabled,
+			File:    *rawMetricsFile,
+			Prefix:  *rawMetricsPrefix,
+		},
 	}
 }
 
@@ -102,4 +124,14 @@ func GetAppConfig() *applicationConfiguration {
 //IsPromMetricsModuleEnabled says if PromMetrics module is enabled or not, based on activation flag.
 func IsPromMetricsModuleEnabled() bool {
 	return appConfig.PromMetrics.Enabled
+}
+
+//IsRawMetricsModuleEnabled reports if RawMetrics module is enabled or not, based on activation flag.
+func IsRawMetricsModuleEnabled() bool {
+	return appConfig.RawMetrics.Enabled
+}
+
+//LogRawMetricsToFile defines if RawMetrics should be written to file or not, based on file flag
+func LogRawMetricsToFile() bool {
+	return appConfig.RawMetrics.File != ""
 }
