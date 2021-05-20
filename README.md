@@ -64,5 +64,30 @@ Module that provides application metrics. It writes metrics to stdout (applicati
 --with-raw-metrics
 ```
 
+## Systemd Daemon
+* Simple Example
+```unit file (systemd)
+[Unit]
+Description=Fake SSH
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=5s
+Environment="ACCESS_LOG=connections.log"
+WorkingDirectory=/srv/honeypot
+ExecStart=/srv/honeypot/honeypot \
+    --hostkey=honeypot.id_rsa \
+    --geoip-mmdb-file=/var/lib/GeoIP/GeoLite2-City.mmdb \
+    --prom-metrics-enable
+
+SyslogIdentifier=honeypot
+
+[Install]
+WantedBy=multi-user.target
+```
+
 ## Projekt Logo
 ![Logo](logo.png?raw=true)
