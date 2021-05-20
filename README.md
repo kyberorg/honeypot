@@ -63,3 +63,7 @@ Module that provides application metrics. It writes metrics to stdout (applicati
 ```shell
 --with-raw-metrics
 ```
+
+
+## Projekt Logo
+![Logo](logo.png?raw=true)
