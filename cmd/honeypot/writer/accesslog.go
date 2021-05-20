@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"github.com/kyberorg/honeypot/cmd/honeypot/config"
 	"github.com/kyberorg/honeypot/cmd/honeypot/dto"
-	"github.com/kyberorg/honeypot/cmd/honeypot/modules/geoip"
+	"github.com/kyberorg/honeypot/cmd/honeypot/geoip"
 	logg "log"
 )
 

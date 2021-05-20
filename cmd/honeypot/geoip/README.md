@@ -1,6 +1,6 @@
-# GeoIP module
+# GeoIP
 
-This module enriches access log with geoip information, based on IP. 
+GeoIP enriches access log with geoip information (city, region, country) based on IP. 
 Needs [Maxmind GeoIP2 City-database](https://www.maxmind.com/en/geoip2-city) to work correctly.
 
 ### GeoIP information added

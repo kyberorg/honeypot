@@ -37,16 +37,16 @@ See our [DockerHub Repo](https://hub.docker.com/repository/docker/kyberorg/honey
    bin/honeypot --help
 ```
 
-## Modules
-### GeoIP Module
-This module enriches access log with geoip information, based on connection IP.
+## GeoIP
+GeoIP enriches access log with geoip information (city, region, country) based on connection IP.
 
-[Module Readme](cmd/honeypot/modules/geoip/README.md)
+[GeoIP Readme](cmd/honeypot/geoip/README.md)
 
 ```shell
 --geoip-mmdb-file=/path/to/GeoLite2-City.mmdb
 ```
 
+## Modules
 ### Prometheus Metrics Module
 Module that exposes prometheus metrics.
 
