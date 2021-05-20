@@ -50,7 +50,7 @@ GeoIP enriches access log with geoip information (city, region, country) based o
 ### Prometheus Metrics Module
 Module that exposes prometheus metrics.
 
-[Module Readme](cmd/honeypot/modules/prom/README.md)
+[Module Readme](cmd/honeypot/mod/prom/README.md)
 
 ```shell
 --with-prom-metrics
@@ -59,7 +59,7 @@ Module that exposes prometheus metrics.
 # Raw metrics module
 
 Module that provides application metrics. It writes metrics to stdout (application log) or to file.
-[Module Readme](cmd/honeypot/modules/rawmetrics/README.md)
+[Module Readme](cmd/honeypot/mod/rawmetrics/README.md)
 ```shell
 --with-raw-metrics
 ```
